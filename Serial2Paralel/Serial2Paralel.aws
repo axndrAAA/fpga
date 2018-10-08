@@ -1,0 +1,15 @@
+[Version]
+Version=10.4
+[Designs]
+ver1=.\ver1\ver1.adf
+[Browser]
+sort=order
+mode=none
+[Order]
+order=1
+macro=
+[Expand]
+ver1=1
+ver2=0
+[Settings]
+Active=ver1
