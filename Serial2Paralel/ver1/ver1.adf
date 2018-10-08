@@ -67,9 +67,14 @@ Name7=HTML
 Directory7=f:\git\fpga\Serial2Paralel\ver1\
 Extension7=htm;html
 
+[Groups]
+
 [Files]
 /ver1.vhd=-1
 
 [Files.Data]
 .\src\ver1.vhd=VHDL Source Code
+.\src\TestBench\ver1_TB.vhd=VHDL Test Bench
+.\src\TestBench\ver1_TB_tim_cfg.vhd=VHDL Test Bench
+.\src\TestBench\ver1_TB_runtest.do=Macro
 
