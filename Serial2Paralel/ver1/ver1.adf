@@ -11,12 +11,12 @@ compile=ver1
 ver1=.\ver1\ver1.lib
 
 [Settings]
-AccessRead=0
+AccessRead=1
 AccessReadWrite=0
 AccessACCB=0
 AccessACCR=0
 AccessReadWriteSLP=0
-AccessReadTopLevel=1
+AccessReadTopLevel=0
 DisableC=1
 ENABLE_ADV_DATAFLOW=0
 FLOW_TYPE=HDL
@@ -27,6 +27,12 @@ ON_SERVERFARM_SYNTH=0
 ON_SERVERFARM_IMPL=0
 ON_SERVERFARM_SIM=0
 DVM_DISPLAY=NO
+SimulationAccessReadPaths=
+SimulationAccessReadModules=
+SimulationAccessReadWritePaths=
+SimulationAccessReadWriteModules=
+SimulationAccessNetsPaths=
+SimulationAccessNetsModules=
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -46,7 +52,7 @@ UCF=
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=
+HierarchyInformation=ver1|ver1|0 ver1_tb|testbench_for_ver1|1 
 ShowHide=ShowTopLevel
 Selected=
 
@@ -68,13 +74,17 @@ Directory7=f:\git\fpga\Serial2Paralel\ver1\
 Extension7=htm;html
 
 [Groups]
+TestBench=1
 
 [Files]
 /ver1.vhd=-1
+/waveForm.awc=-1
+TestBench/ver1_TB.vhd=-1
+TestBench/ver1_TB_runtest.do=-1
 
 [Files.Data]
 .\src\ver1.vhd=VHDL Source Code
+.\src\waveForm.awc=Accelerated Waveform Configuration
 .\src\TestBench\ver1_TB.vhd=VHDL Test Bench
-.\src\TestBench\ver1_TB_tim_cfg.vhd=VHDL Test Bench
 .\src\TestBench\ver1_TB_runtest.do=Macro
 
