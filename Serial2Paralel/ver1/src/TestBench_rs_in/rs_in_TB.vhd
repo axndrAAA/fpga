@@ -73,7 +73,7 @@ begin
 process is
 begin		   
 	wait for 2000 ns;
-	UART_WRITE_BYTE(B"01010101", uart_in);	 
+	UART_WRITE_BYTE(B"11111111", uart_in);	 
 	wait for 20 ms;
 end process;
 
