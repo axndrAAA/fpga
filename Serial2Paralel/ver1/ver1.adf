@@ -52,7 +52,7 @@ UCF=
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=ver1|ver1|0 ver1_tb|testbench_for_ver1|1 
+HierarchyInformation=ver1|ver1|0 ver1_tb|testbench_for_ver1|1
 ShowHide=ShowTopLevel
 Selected=
 
@@ -79,12 +79,14 @@ TestBench=1
 [Files]
 /ver1.vhd=-1
 /waveForm.awc=-1
+/UartRxExample.vhd=-1
 TestBench/ver1_TB.vhd=-1
 TestBench/ver1_TB_runtest.do=-1
 
 [Files.Data]
 .\src\ver1.vhd=VHDL Source Code
 .\src\waveForm.awc=Accelerated Waveform Configuration
+.\src\UartRxExample.vhd=VHDL Source Code
 .\src\TestBench\ver1_TB.vhd=VHDL Test Bench
 .\src\TestBench\ver1_TB_runtest.do=Macro
 
