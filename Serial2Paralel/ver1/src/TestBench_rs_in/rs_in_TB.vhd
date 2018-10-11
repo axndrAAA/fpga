@@ -15,8 +15,8 @@ architecture TB_ARCHITECTURE of rs_in_tb is
 		reset : in STD_LOGIC;
 		uart_in : in STD_LOGIC;
 		data_out : out STD_LOGIC_VECTOR(7 downto 0);
-		data_rdy : out STD_LOGIC;
-		test_out1	: out std_logic_vector(1 downto 0));
+		data_rdy : out STD_LOGIC
+		);
 	end component;
 	
 	--Stimulus constants
@@ -29,7 +29,6 @@ architecture TB_ARCHITECTURE of rs_in_tb is
 	-- Observed signals - signals mapped to the output ports of tested entity
 	signal data_out : STD_LOGIC_VECTOR(7 downto 0);
 	signal data_rdy : STD_LOGIC;
-	signal test_out1	:  std_logic_vector(1 downto 0);   
 	signal msg_changed : STD_LOGIC:='0'; 
 	--signal rst : STD_LOGIC:= '0';
 	
@@ -78,14 +77,14 @@ begin
 			reset => reset,
 			uart_in => uart_in,
 			data_out => data_out,
-			data_rdy => data_rdy,	
-			test_out1 =>test_out1
+			data_rdy => data_rdy	
 		);
 
 	-- Add your stimulus here ...
 	
 	clk	<= not clk after 5 ns; 		   
-	reset	<= not reset after 300000 ns;
+	--reset	<= not reset after 300000 ns;
+	--reset<='1','0' after 200000 ns;
 process is
 begin
 
@@ -94,8 +93,6 @@ begin
 ----отправка сообщения 	 
 --    UART_WRITE_BYTE(x"4C", uart_in);
 ----	wait for 20 ms;	     
---	
---	
 ---- проверка принятого сообщения	  
 ----	if(data_rdy = '1')then
 ----	end if;
@@ -104,24 +101,34 @@ begin
 --   		else
 --      		report "Тест не пройден. Принят не корректный байт" severity note;
 --    	end if;
+--
+ 
+		 for i in 0 to 5 loop
+			if(reset = '0')then
+				test_msg <= test_msg + '1';
+				msg_changed <= not msg_changed;	 
+				wait for 2000 ns;
+				UART_WRITE_BYTE(test_msg, uart_in);
+				report "Отправлен байт " & to_string(test_msg) severity note;
+	    		if (data_out = test_msg) then
+      				report "Тест пройден. Принят корректный байт " & to_string(data_out) severity note;
+   				else
+      				report "Тест не пройден. Принят не корректный байт " & to_string(data_out) severity note;
+    			end if;
+			else
+				uart_in <= '0';	
+			end if;			 
+		end loop; 
 	 
 	 
-	 for i in 0 to 5 loop
-		test_msg(i) <= '1';
-		msg_changed <= not msg_changed;	 
-		wait for 2000 ns;
-		UART_WRITE_BYTE(test_msg, uart_in);
-		report "Отправлен байт " & to_string(test_msg) severity note;
-	    if (data_out = test_msg) then
-      		report "Тест пройден. Принят корректный байт " & to_string(data_out) severity note;
-   		else
-      		report "Тест не пройден. Принят не корректный байт " & to_string(data_out) severity note;
-    	end if;
-	 end loop; 
 	 
-	 
-	 
-	 assert false report "Тест завершен" severity note;
+	 --assert false report "Тест завершен" severity note;
+end process; 
+
+process		
+begin  
+   wait for 200000 ns;
+   reset<= not reset after 5 ns;
 end process;
 
 end TB_ARCHITECTURE;

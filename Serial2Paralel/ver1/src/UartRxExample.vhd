@@ -22,11 +22,8 @@ entity rs_in is
 	reset		: in std_logic;  -- 1 - reset
 	uart_in		: in std_logic;
 	data_out	: out std_logic_vector(7 downto 0);
-	data_rdy	: out std_logic;
-	test_out1	: out std_logic_vector(1 downto 0));
-	
-	
-	
+	data_rdy	: out std_logic
+	);
 end rs_in;			
 
 
@@ -63,9 +60,9 @@ begin
 		if(reset = '1')then  -- определяем состояние внешних и внутренних сигналов по сбросу
 			st_main	<= "00";  --сигнал, определяющий работу конечного автомата. будет не более 4 сосотяний
 			data_rdy	<= '0';	-- всегда требуется сигнал готвоности выходных данных по ресету обнулять. иначе могут работать некорректно последующие схемы. которые используют этот сигнал  
-			cnt0	<= (others=>'0');
+			cnt0	<= (others=>'0');	 
+			data_out	<= (others=>'0');
 		else   
-			test_out1 <= st_main;
 			case st_main is 
 			when "00"=>	  --начальное состояние. ждем стартовый бит
 				if(	uart_in = '0')then --если пришел стартовый бит, начинаем считать половину длины этого стартового бита, чтоб оказаться максимально близко к середине

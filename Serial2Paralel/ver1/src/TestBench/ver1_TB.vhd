@@ -77,11 +77,3 @@ end process;
 
 end TB_ARCHITECTURE;
 
-configuration TESTBENCH_FOR_ver1 of ver1_tb is
-	for TB_ARCHITECTURE
-		for UUT : ver1
-			use entity work.ver1(ver1);
-		end for;
-	end for;
-end TESTBENCH_FOR_ver1;
-
