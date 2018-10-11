@@ -73,18 +73,11 @@ begin
 process is
 begin		   
 	wait for 2000 ns;
-	UART_WRITE_BYTE(B"11111111", uart_in);	 
+	UART_WRITE_BYTE(B"10110101", uart_in);	 
 	wait for 20 ms;
 end process;
 
 
 end TB_ARCHITECTURE;
 
-configuration TESTBENCH_FOR_rs_in of rs_in_tb is
-	for TB_ARCHITECTURE
-		for UUT : rs_in
-			use entity work.rs_in(rs_in);
-		end for;
-	end for;
-end TESTBENCH_FOR_rs_in;
 
