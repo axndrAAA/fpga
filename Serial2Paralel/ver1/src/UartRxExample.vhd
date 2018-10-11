@@ -44,8 +44,18 @@ signal cnt_bits		: std_logic_vector(7 downto 0);  --счетчик принимаемых бит
 signal st_main		: std_logic_vector(1 downto 0):="00";		--сигнал, определяющий работу конечного автомата. будет не более 4 сосотяний
 signal shift_reg	: std_logic_vector(7 downto 0);
 
+-- функция реверса регистра
+function reverse(X : in std_logic_vector) return std_logic_vector is
+variable ret : std_logic_vector(X'range);
 begin
+    for i in X'range loop
+        ret(i) := X(X'left - i);
+    end loop;
+   return ret;
+end function;
 
+begin
+	
 pr_main: process(clk)
 	
 begin  
@@ -95,14 +105,14 @@ begin
 				else
 					--какие то действия, если стоп бита на входе нет.
 				end if;
-					data_out	<= shift_reg;
+					data_out	<= reverse(shift_reg);--реверс последовательности бит для перевода MSB  в LSB
 					--data_rdy	<= '1';			
 			
 			when others=> null;
 			end case;
 		end if;
 		
-	
+				  
 		
 	end if;
 	

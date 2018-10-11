@@ -52,7 +52,7 @@ UCF=
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=ver1|ver1|0 ver1_tb|testbench_for_ver1|1
+HierarchyInformation=rs_in|rs_in|0 rs_in_tb|testbench_for_rs_in|1 
 ShowHide=ShowTopLevel
 Selected=
 

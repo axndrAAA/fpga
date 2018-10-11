@@ -72,9 +72,31 @@ begin
 	
 process is
 begin		   
+--	wait for 2000 ns;
+--	UART_WRITE_BYTE(B"10110101", uart_in);	 
+--	wait for 20 ms;	 	 
+
+--отправка сообщения 	 
 	wait for 2000 ns;
-	UART_WRITE_BYTE(B"10110101", uart_in);	 
-	wait for 20 ms;
+    wait until rising_edge(clk);
+    UART_WRITE_BYTE(x"4C", uart_in);
+     
+	
+	
+	-- проверка принятого сообщения	  
+	--wait until rising_edge(data_rdy);	
+	if(rising_edge(data_rdy))then
+	
+	end if;
+	
+    	if (data_out = x"4C") then
+      		report "Тест пройден. Принят корректный байт" severity note;
+   		else
+      		report "Тест не пройден. Принят не корректный байт" severity note;
+    	end if;
+ 
+    assert false report "Тест завершен" severity note;	
+	
 end process;
 
 
