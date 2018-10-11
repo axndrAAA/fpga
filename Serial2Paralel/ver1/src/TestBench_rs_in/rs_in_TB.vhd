@@ -30,7 +30,8 @@ architecture TB_ARCHITECTURE of rs_in_tb is
 	signal data_out : STD_LOGIC_VECTOR(7 downto 0);
 	signal data_rdy : STD_LOGIC;
 	signal test_out1	:  std_logic_vector(1 downto 0);   
-	signal msg_changed : STD_LOGIC:='0';
+	signal msg_changed : STD_LOGIC:='0'; 
+	--signal rst : STD_LOGIC:= '0';
 	
 	--оправляемое сообщение
 	signal  test_msg : std_logic_vector(7 downto 0):= x"4C";
@@ -84,9 +85,10 @@ begin
 	-- Add your stimulus here ...
 	
 	clk	<= not clk after 5 ns; 		   
-	reset <= not reset after 170000 ns;
+	reset	<= not reset after 300000 ns;
 process is
-begin		   
+begin
+
 	wait for 2000 ns; 
 	
 ----отправка сообщения 	 
@@ -121,7 +123,6 @@ begin
 	 
 	 assert false report "Тест завершен" severity note;
 end process;
-
 
 end TB_ARCHITECTURE;
 
