@@ -36,6 +36,8 @@ end uart_tx;
 architecture uart_tx of uart_tx is
 begin
 
-	 -- enter your statements here --
+	-- enter your statements here --
+	
+	
 
 end uart_tx;
