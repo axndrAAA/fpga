@@ -67,7 +67,8 @@ begin
 
 				when buferingData =>
 					input_data_bufer <= data_in;
-					st_main <= txStartBit;				
+					st_main <= txStartBit;
+					clk_bit_counter <=(others=>'0'); -- обнуляем счетчик
 				when txStartBit =>
 					uart_out <= '0'; -- устанавливаем лог.0 на выход
 					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита

@@ -24,6 +24,7 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
+fileopenfolder=E:\git\fpga\RayCoordinatesReceiver\RayCoordinatesReceiver\src
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -36,23 +37,28 @@ CompileWithDebug=0
 RayCoordinatesReceiver=.
 Active_lib=
 
+[Groups]
+TestBench=1
+
+[SpecTracer]
+WindowVisible=0
+
+[HierarchyViewer]
+HierarchyInformation=uart_tx_tb|TB_ARCHITECTURE|0
+ShowHide=ShowTopLevel
+Selected=
+
 [Files]
 /uart_TX.vhd=-1
 /CoordinaresRX_main_auto.vhd=-1
+/uart_RX.vhd=-1
 TestBench/uart_tx_TB.vhd=-1
 TestBench/uart_tx_TB_runtest.do=-1
 
 [Files.Data]
 .\src\uart_TX.vhd=VHDL Source Code
 .\src\CoordinaresRX_main_auto.vhd=VHDL Source Code
+.\src\uart_RX.vhd=VHDL Source Code
 .\src\TestBench\uart_tx_TB.vhd=VHDL Test Bench
 .\src\TestBench\uart_tx_TB_runtest.do=Macro
 
-[Groups]
-TestBench=1
-[SpecTracer]
-WindowVisible=0
-[HierarchyViewer]
-HierarchyInformation=uart_tx_tb|TB_ARCHITECTURE|0  
-ShowHide=ShowTopLevel
-Selected=
