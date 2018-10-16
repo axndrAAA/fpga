@@ -44,7 +44,7 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=rs_in|rs_in|0 uart_tx_tb|TB_ARCHITECTURE|0
+HierarchyInformation=uart_tx_tb|TB_ARCHITECTURE|0  
 ShowHide=ShowTopLevel
 Selected=
 

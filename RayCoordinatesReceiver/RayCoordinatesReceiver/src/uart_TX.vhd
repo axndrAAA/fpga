@@ -46,7 +46,7 @@ architecture uart_tx of uart_tx is
 	signal st_main			:	stm_states:= waitData; -- переменная состояния конечного автомата
 	signal tx_bit_index 	:	integer range 0 to 7:=0; -- счетчик переданного бита
 	signal input_data_bufer	: 	std_logic_vector(7 downto 0):=(others => '0'); -- входной буфер
-	signal clk_bit_counter	: 	std_logic_vector(15 downto 0); -- счетчик отсчета тактового сигнала при передаче бита
+	signal clk_bit_counter	: 	std_logic_vector(15 downto 0); -- счетчик отсчета тактового сигнала при передаче бита  
 	
 	
 begin
