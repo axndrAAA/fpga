@@ -44,7 +44,7 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=rs_in|rs_in|0 uart_tx_tb|TB_ARCHITECTURE|0 
+HierarchyInformation=rs_in|rs_in|0 uart_tx_tb|TB_ARCHITECTURE|0
 ShowHide=ShowTopLevel
 Selected=
 
@@ -52,6 +52,7 @@ Selected=
 /uart_TX.vhd=-1
 /CoordinaresRX_main_auto.vhd=-1
 /uart_RX.vhd=-1
+/PackageParser.vhd=-1
 TestBench/uart_tx_TB.vhd=-1
 TestBench/uart_tx_TB_runtest.do=-1
 
@@ -59,6 +60,7 @@ TestBench/uart_tx_TB_runtest.do=-1
 .\src\uart_TX.vhd=VHDL Source Code
 .\src\CoordinaresRX_main_auto.vhd=VHDL Source Code
 .\src\uart_RX.vhd=VHDL Source Code
+.\src\PackageParser.vhd=VHDL Source Code
 .\src\TestBench\uart_tx_TB.vhd=VHDL Test Bench
 .\src\TestBench\uart_tx_TB_runtest.do=Macro
 
