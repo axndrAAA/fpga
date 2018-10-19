@@ -56,16 +56,26 @@ constant commandCode		: std_logic_vector(7 downto 0):=x"22"; -- код комманды для
 		readCommand, -- считываем  комманду
 		readPackageBody, -- считываем тело пакета
 		readReserveByte, --считываем резервный байт
-		readCSByte -- считываем байт контрольной суммы
+		readCSByte, -- считываем байт контрольной суммы
+		checkCS, -- считаем и проверяем контрольную сумму
+		setData2Out, -- выставляем данные на выходы
+		dataRdy_formAnsw -- валидные данные на выходе, формируем ответ
 	);
 	signal stm_parser		:	stm_states:= waitData; -- переменная состояния конечного автомата
-	signal input_message	:	std_logic_vector(119 downto 0); --входное сообщение
+	signal input_message	:	std_logic_vector(103 downto 0); --входное сообщение
 	signal recv_byte_count 	:	std_logic_vector(7 downto 0):=x"00"; -- счетчик считанных бит(используется для чтения многобитных полей)
 	signal packageBodySize	: 	std_logic_vector(15 downto 0):=(others => '0'); -- размер посылки (считывается из команды на входе)
 	signal isCorrectCommandRecv : std_logic:='0';
-
-
-
+	signal CS_recv_byte 	:	std_logic_vector(7 downto 0):=x"00";  
+	
+function checkCSC ( message : in std_logic_vector;
+					cs_recv	 : std_logic_vector
+					) return boolean is	
+begin
+	-- TODO:
+	-- здесь реализуется рассчет контрольной суммы
+	return TRUE;
+end function;
 
 begin
 	main_pr : process(clk)
@@ -83,14 +93,18 @@ begin
 			case stm_parser is
 				when waitdata => -- ожидаем прихода стартового символа
 					input_message <= (others => '0'); -- сбрасываем считанное сообщение
-					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета
+					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
+					coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
+					command_rdy <= '0';
+					LsinA <= (others => '0');
+					LsinB <= (others => '0');
+					command_output <= (others => '0');
 					if(data_input_rdy = '1')then
 						stm_parser <= readStartSymbol;
 					end if;				
 				when readStartSymbol =>
 					if(data_input_rdy = '1')then
-						if(data_input = StartSymbol)then -- получен стартовый символ посылки 
-							input_message <= input_message(111 downto 0) & data_input; -- считываем байт в буфер
+						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля
 						else 							 -- получен какой то мусор. 
 							stm_parser <= waitData; -- Возвращаемся к ожиданию стартового символа
@@ -100,10 +114,10 @@ begin
 				when readModuleAdr =>
 					if(data_input_rdy = '1')then
 						if(data_input = module_adress)then -- считан адрес данного модуля
-							input_message <= input_message(111 downto 0) & data_input; -- считываем байт в буфер
+							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 							stm_parser <= specAdrRead; -- переходим к считыванию команды
 						elsif (data_input = multicastAddress)then -- получен общий адрес 
-							input_message <= input_message(111 downto 0) & data_input; -- считываем байт в буфер
+							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 							stm_parser <= multucastAdrRead; -- переходим к считыванию общей команды 
 						else 
 							stm_parser <= waitData; -- считан мусор -> возвращаемся к ожиданию стартового символа
@@ -117,7 +131,7 @@ begin
 						  	recv_byte_count <= (others=> '0');		-- сбрасываем счетчик принятых байт
 						  	stm_parser <= readCommand; -- и переходим к считыванию комманды
 						else
-							input_message <= input_message(111 downto 0) & data_input; -- считываем байт в буфер
+							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 							packageBodySize <= packageBodySize(7 downto 0) & data_input; -- считываем размер в отдельную переменную
 							recv_byte_count <= recv_byte_count + 1;
 						end if;
@@ -130,7 +144,7 @@ begin
 				when readCommand =>
 					if(data_input_rdy = '1')then -- считываем комманду
 					 	if(data_input = commandCode)then -- если принимаемая комманда содержит наш код, то считываем тело пакета
-							 input_message <= input_message(111 downto 0) & data_input;
+							 input_message <= input_message(95 downto 0) & data_input;
 							 stm_parser <= readPackageBody;
 						else
 							stm_parser <= waitData; -- комманда не наша, возвращаемся к ожиданию данных
@@ -142,14 +156,32 @@ begin
 							recv_byte_count <= (others=> '0');
 							stm_parser <= readReserveByte;
 						else
-							input_message <= input_message(111 downto 0) & data_input; -- считываем байт в буфер
+							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 							recv_byte_count <= recv_byte_count + 1;
 						end if;
 					end if;				
 				when readReserveByte =>
-				
+					if(data_input_rdy = '1')then -- читаем резервный байт
+						input_message <= input_message(95 downto 0) & data_input;
+						stm_parser <= readCSByte;
+					end if;				
 				when readCSByte =>
+					if(data_input_rdy = '1')then -- читаем байт контрольной суммы
+						CS_recv_byte <= data_input;
+						stm_parser <= readCSByte;
+					end if;	 
+				when checkCS =>
+				   	if(checkCSC(input_message,CS_recv_byte))then 
+						stm_parser <= setData2Out; -- проверка пройдена, выставляем данные на выход
+					else
+						stm_parser <= waitData; -- контрольная сумма не верна, ожидаем новый пакет
+					end if;					
 				
+				when setData2Out =>
+					LsinB <= input_message(95 downto 64);
+					LsinA <= input_message(63 downto 32);
+				when dataRdy_formAnsw =>
+					coord_data_rdy <= '1';				
 				when others => 
 					stm_parser <= waitData;
 				end case;

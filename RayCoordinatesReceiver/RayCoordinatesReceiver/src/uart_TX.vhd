@@ -28,7 +28,8 @@ entity uart_tx is
 	data_in		: in std_logic_vector(7 downto 0);-- 8 битна€ входна€ шина
 	data_in_rdy	: in std_logic; -- 1- значит на data_in валидные данные и их можно считывать
 
-	uart_out	: out std_logic -- выходной uart 8N1 115200
+	uart_out	: out std_logic; -- выходной uart 8N1 115200
+	msg_sent	: out std_logic	-- флаг отправки очередного сообщени€
 	);
 end uart_tx;
 
@@ -59,13 +60,15 @@ begin
 			
 			case st_main is				
 				when waitData => -- режим ожидани€ данных на входе
-					uart_out <= '1'; --	подт€гиваем выход к логической 1   
+					uart_out <= '1'; --	подт€гиваем выход к логической 1
+					msg_sent <= '1';	 
 					tx_bit_index <= 0; -- обнул€ем счетчик переданных бит
 					if (data_in_rdy = '1')then -- если на входной шине есть валидные данные
 						st_main <= buferingData; -- переходим к буферизации данных
 					end if;	
 
 				when buferingData =>
+					msg_sent <= '0';
 					input_data_bufer <= data_in;
 					st_main <= txStartBit;
 					clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
