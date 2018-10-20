@@ -70,11 +70,21 @@ constant commandCode		: std_logic_vector(7 downto 0):=x"22"; -- код комманды для
 	
 function checkCSC ( message : in std_logic_vector;
 					cs_recv	 : std_logic_vector
-					) return boolean is	
+					) return boolean is
+variable ret : std_logic_vector(7 downto 0):=(others=>'0');
+variable tmp : std_logic_vector(7 downto 0);
 begin
 	-- TODO:
 	-- здесь реализуется рассчет контрольной суммы
-	return TRUE;
+	for i in 0 to 14 loop
+		tmp := message(103-i downto 95-i);
+		ret := ret + tmp;
+	end loop;
+	if(ret = cs_recv)then
+		return TRUE;
+	else
+		return FALSE;
+	end if;	
 end function;
 
 begin

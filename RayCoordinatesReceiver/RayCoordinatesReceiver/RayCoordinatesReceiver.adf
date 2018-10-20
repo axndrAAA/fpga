@@ -44,7 +44,7 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=uart_tx_tb|TB_ARCHITECTURE|0
+HierarchyInformation=
 ShowHide=ShowTopLevel
 Selected=
 
@@ -56,6 +56,8 @@ Selected=
 /answerBuilder.vhd=-1
 TestBench/uart_tx_TB.vhd=-1
 TestBench/uart_tx_TB_runtest.do=-1
+TestBench/packageparser_TB.vhd=-1
+TestBench/packageparser_TB_runtest.do=-1
 
 [Files.Data]
 .\src\uart_TX.vhd=VHDL Source Code
@@ -66,3 +68,5 @@ TestBench/uart_tx_TB_runtest.do=-1
 .\src\TestBench\uart_tx_TB.vhd=VHDL Test Bench
 .\src\TestBench\uart_tx_TB_runtest.do=Macro
 
+.\src\TestBench\packageparser_TB.vhd=VHDL Test Bench
+.\src\TestBench\packageparser_TB_runtest.do=Macro
