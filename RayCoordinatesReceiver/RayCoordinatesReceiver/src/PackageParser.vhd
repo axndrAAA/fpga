@@ -76,15 +76,16 @@ variable tmp : std_logic_vector(7 downto 0);
 begin
 	-- TODO:
 	-- здесь реализуется рассчет контрольной суммы
-	for i in 0 to 14 loop
-		tmp := message(103-i downto 95-i);
-		ret := ret + tmp;
-	end loop;
-	if(ret = cs_recv)then
-		return TRUE;
-	else
-		return FALSE;
-	end if;	
+--	for i in 0 to 14 loop
+--		tmp := message(103-i downto 95-i);
+--		ret := ret + tmp;
+--	end loop;
+--	if(ret = cs_recv)then
+--		return TRUE;
+--	else
+--		return FALSE;
+--	end if;	
+	return TRUE;
 end function;
 
 begin

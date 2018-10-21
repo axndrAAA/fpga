@@ -44,7 +44,7 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=
+HierarchyInformation=packageparser_tb|TB_ARCHITECTURE|0 
 ShowHide=ShowTopLevel
 Selected=
 

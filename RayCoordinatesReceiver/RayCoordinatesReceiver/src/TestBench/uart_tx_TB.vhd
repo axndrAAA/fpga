@@ -92,7 +92,7 @@ begin
 				test_msg <= test_msg + '1';
 				msg_changed <= not msg_changed;	 
 				wait for 2000 ns;
-				--отправляем новый бит
+				--отправляем новый байт
 				data_in <= test_msg; 
 				data_in_rdy <= '1';
 				report "Отправлен байт " & to_string(test_msg) severity note;
