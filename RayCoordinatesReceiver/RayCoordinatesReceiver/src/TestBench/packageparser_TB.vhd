@@ -2,7 +2,10 @@ library ieee;
 use ieee.STD_LOGIC_UNSIGNED.all;
 use ieee.std_logic_1164.all;
 use IEEE.STD_LOGIC_unsigned.all;
-	-- Add your library and packages declaration here ...
+-- Add your library and packages declaration here ...
+use ieee.numeric_std.all;
+use STD.textio.all;
+use ieee.std_logic_textio.all;
 
 entity packageparser_tb is
 end packageparser_tb;
@@ -52,6 +55,9 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	
 	--входные сигналы uart приемника
 	signal uart_in : STD_LOGIC:='1';
+	
+	--для файлов
+	file file_bytes : text;
 
 begin
 
@@ -82,37 +88,53 @@ begin
 --	
 	
 	clk	<= not clk after 5 ns;
-process	is
-begin  	  
-	wait for 20 ns;
-	if(clk = '1')then
-		data_input_rdy <= '1';
-		data_input <= x"3A";
-		wait for 5 ns;
-		data_input <= module_adress;
-		wait for 5 ns;
-		data_input <= x"00";
-		wait for 5 ns;
-		data_input <= x"08";
-		wait for 5 ns;
-		data_input <= x"22";
-		wait for 5 ns;
-		data_input <= x"12"; 
-		wait for 5 ns;
-		data_input <= x"34";
-		wait for 5 ns;
-		data_input <= x"56"; 
-		wait for 5 ns;
-		data_input <= x"78";
-		wait for 5 ns;
-		data_input <= x"11";
-		wait for 5 ns;
-		data_input <= x"80";
-		wait for 5 ns;
-		data_input <= x"00";  
-		data_input_rdy <= '0';
-	end if;
+process	is 
+    variable v_ILINE     : line;
+    variable n_byte : std_logic_vector(7 downto 0);
+    variable v_SPACE     : character;
+begin  
+	file_open(file_bytes, "input_bytes.txt",  read_mode);
 	
+	wait for 15 ns;
+	while not endfile(file_bytes) loop
+			readline(file_bytes, v_ILINE);
+			read(v_ILINE, n_byte);
+			data_input <= n_byte;
+			data_input_rdy <= '1';	
+		wait for 10 ns;
+	end loop;	   
+	data_input <= x"00";
+	data_input_rdy <= '0';	
+	wait for 20 ns;
+	file_close(file_bytes);
+	--if(clk = '1')then
+--		data_input_rdy <= '1';
+--		data_input <= x"3A";
+--		wait for 5 ns;
+--		data_input <= module_adress;
+--		wait for 5 ns;
+--		data_input <= x"00";
+--		wait for 5 ns;
+--		data_input <= x"08";
+--		wait for 5 ns;
+--		data_input <= x"22";
+--		wait for 5 ns;
+--		data_input <= x"12"; 
+--		wait for 5 ns;
+--		data_input <= x"34";
+--		wait for 5 ns;
+--		data_input <= x"56"; 
+--		wait for 5 ns;
+--		data_input <= x"78";
+--		wait for 5 ns;
+--		data_input <= x"11";
+--		wait for 5 ns;
+--		data_input <= x"80";
+--		wait for 5 ns;
+--		data_input <= x"00";  
+--		data_input_rdy <= '0';
+--	end if;
+--	
 		
 		assert false report "Finish." severity note;
 end process;
