@@ -172,7 +172,7 @@ begin
 						input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 						recv_byte_count <= recv_byte_count + 1;	
 						
-						if(recv_byte_count = packageBodySize)then -- все байты тела пакета считаны идем дальше
+						if(recv_byte_count = (packageBodySize-1))then -- все байты тела пакета считаны идем дальше
 							recv_byte_count <= (others=> '0');
 							stm_parser <= readReserveByte;
 						end if;
@@ -185,20 +185,22 @@ begin
 				when readCSByte =>
 					if(data_input_rdy = '1')then -- читаем байт контрольной суммы
 						CS_recv_byte <= data_input;
-						stm_parser <= readCSByte;
+						stm_parser <= checkCS;
 					end if;	 
 				when checkCS =>
-				   	if(TRUE)then --	checkCSC(input_message,CS_recv_byte)
-						stm_parser <= setData2Out; -- проверка пройдена, выставляем данные на выход
+				   	if(checkCSC(input_message,CS_recv_byte))then --	проверяем КС
+						stm_parser <= setData2Out; -- проверка пройдена,
 					else
 						stm_parser <= waitStartSymbol; -- контрольная сумма не верна, ожидаем новый пакет
 					end if;					
 				
-				when setData2Out =>
+				when setData2Out =>	--выставляем данные на выход
 					LsinB <= input_message(95 downto 64);
 					LsinA <= input_message(63 downto 32);
-				when dataRdy_formAnsw =>
-					coord_data_rdy <= '1';				
+					stm_parser <= dataRdy_formAnsw;
+				when dataRdy_formAnsw => -- посылаем команду на формирование ответа 
+					coord_data_rdy <= '1';
+					stm_parser <= waitStartSymbol; -- и переходим на исходную
 				when others => 
 					stm_parser <= waitStartSymbol;
 				end case;
