@@ -103,8 +103,9 @@ begin
 				else
 					--какие то действия, если стоп бита на входе нет.
 				end if;
-					data_out	<= reverse(shift_reg);--реверс последовательности бит для перевода MSB  в LSB
-					--data_rdy	<= '1';			
+				data_out	<= reverse(shift_reg);--реверс последовательности бит для перевода MSB  в LSB
+				--data_out	<= shift_reg;
+				--data_rdy	<= '1';			
 			
 			when others=> null;
 			end case;

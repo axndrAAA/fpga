@@ -61,7 +61,7 @@ constant commandCode		: std_logic_vector(7 downto 0):=x"22"; -- код комманды для
 		setData2Out, -- выставляем данные на выходы
 		dataRdy_formAnsw -- валидные данные на выходе, формируем ответ
 	);
-	signal stm_parser		:	stm_states:= waitData; -- переменная состояния конечного автомата
+	signal stm_parser		:	stm_states:= readStartSymbol; -- переменная состояния конечного автомата
 	signal input_message	:	std_logic_vector(103 downto 0); --входное сообщение
 	signal recv_byte_count 	:	std_logic_vector(7 downto 0):=x"00"; -- счетчик считанных бит(используется для чтения многобитных полей)
 	signal packageBodySize	: 	std_logic_vector(15 downto 0):=(others => '0'); -- размер посылки (считывается из команды на входе)
@@ -114,6 +114,13 @@ begin
 						stm_parser <= readStartSymbol;
 					end if;				
 				when readStartSymbol =>
+					input_message <= (others => '0'); -- сбрасываем считанное сообщение
+					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
+					coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
+					command_rdy <= '0';
+					LsinA <= (others => '0');
+					LsinB <= (others => '0');
+					command_output <= (others => '0');
 					if(data_input_rdy = '1')then
 						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля

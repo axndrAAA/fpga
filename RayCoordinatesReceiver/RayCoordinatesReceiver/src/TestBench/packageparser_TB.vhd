@@ -56,8 +56,25 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	--входные сигналы uart приемника
 	signal uart_in : STD_LOGIC:='1';
 	
-	--для файлов
+	--файл с сообщением
 	file file_bytes : text;
+	-- процедура отправки данных по uart
+	procedure UART_WRITE_BYTE (
+    	i_data_in       : in  std_logic_vector(7 downto 0);
+    	signal o_serial : out std_logic) is
+ 	begin 
+    	-- Send Start Bit
+    	o_serial <= '0';
+    	wait for c_BIT_PERIOD; 
+    	-- Send Data Byte
+    	for ii in 0 to 7 loop
+      		o_serial <= i_data_in(ii);
+      	wait for c_BIT_PERIOD;
+    	end loop;  -- ii
+    	-- Send Stop Bit
+    	o_serial <= '1';
+    	wait for c_BIT_PERIOD;
+  	end UART_WRITE_BYTE;
 
 begin
 
@@ -76,16 +93,16 @@ begin
 			command_output => command_output
 		);
 		
---	UUT1 : rs_in
---	port map (	
---			clk => clk,
---			reset => reset,
---			uart_in => uart_in,
---			
---			data_out => data_input,
---			data_rdy => data_input_rdy
---	);	
---	
+	UUT1 : rs_in
+	port map (	
+			clk => clk,
+			reset => reset,
+			uart_in => uart_in,
+			
+			data_out => data_input,
+			data_rdy => data_input_rdy
+	);	
+	
 	
 	clk	<= not clk after 5 ns;
 process	is 
@@ -95,46 +112,25 @@ process	is
 begin  
 	file_open(file_bytes, "input_bytes.txt",  read_mode);
 	
-	wait for 15 ns;
+	wait for 2000 ns;
 	while not endfile(file_bytes) loop
 			readline(file_bytes, v_ILINE);
 			read(v_ILINE, n_byte);
-			data_input <= n_byte;
-			data_input_rdy <= '1';	
+			UART_WRITE_BYTE(n_byte, uart_in);--передача на вход uart
+			report "Msg sent." severity note;
+			--data_input <= n_byte;
+--			data_input_rdy <= '1';	
 		wait for 10 ns;
 	end loop;	   
-	data_input <= x"00";
-	data_input_rdy <= '0';	
-	wait for 20 ns;
-	file_close(file_bytes);
-	--if(clk = '1')then
---		data_input_rdy <= '1';
---		data_input <= x"3A";
---		wait for 5 ns;
---		data_input <= module_adress;
---		wait for 5 ns;
+--	if(not endfile(file_bytes))then
 --		data_input <= x"00";
---		wait for 5 ns;
---		data_input <= x"08";
---		wait for 5 ns;
---		data_input <= x"22";
---		wait for 5 ns;
---		data_input <= x"12"; 
---		wait for 5 ns;
---		data_input <= x"34";
---		wait for 5 ns;
---		data_input <= x"56"; 
---		wait for 5 ns;
---		data_input <= x"78";
---		wait for 5 ns;
---		data_input <= x"11";
---		wait for 5 ns;
---		data_input <= x"80";
---		wait for 5 ns;
---		data_input <= x"00";  
 --		data_input_rdy <= '0';
 --	end if;
---	
+	
+	wait for 20 ns;
+	
+	file_close(file_bytes);
+
 		
 		assert false report "Finish." severity note;
 end process;
