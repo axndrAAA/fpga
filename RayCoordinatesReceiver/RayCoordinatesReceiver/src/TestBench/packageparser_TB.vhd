@@ -110,7 +110,7 @@ process	is
     variable n_byte : std_logic_vector(7 downto 0);
     variable v_SPACE     : character;
 begin
-	-- время моделирования для одного сообщения 1050 us
+	-- время моделирования для одного сообщения 1380 us
 	
 	file_open(file_bytes, "input_bytes.txt",  read_mode);
 	

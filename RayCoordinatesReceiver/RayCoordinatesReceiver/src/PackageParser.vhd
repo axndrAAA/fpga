@@ -153,8 +153,6 @@ begin
 						  	recv_byte_count <= (others=> '0');		-- сбрасываем счетчик принятых байт
 						  	stm_parser <= readCommand; -- и переходим к считыванию комманд
 						end if;
-
-
 					end if;				
 				when multucastAdrRead =>
 					if(data_input_rdy = '1')then
@@ -169,14 +167,14 @@ begin
 							stm_parser <= waitStartSymbol; -- комманда не наша, возвращаемся к ожиданию данных
 						end if;	
 					end if;				
-				when readPackageBody => -- считываем тело пакета (4 байта)
-					if(data_input_rdy = '1')then
-						if(recv_byte_count = packageBodySize)then -- все байты тела пакета считаны
+				when readPackageBody => 
+				if(data_input_rdy = '1')then -- считываем тело пакета (4 байта)
+						input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
+						recv_byte_count <= recv_byte_count + 1;	
+						
+						if(recv_byte_count = packageBodySize)then -- все байты тела пакета считаны идем дальше
 							recv_byte_count <= (others=> '0');
 							stm_parser <= readReserveByte;
-						else
-							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
-							recv_byte_count <= recv_byte_count + 1;
 						end if;
 					end if;				
 				when readReserveByte =>
@@ -190,7 +188,7 @@ begin
 						stm_parser <= readCSByte;
 					end if;	 
 				when checkCS =>
-				   	if(checkCSC(input_message,CS_recv_byte))then 
+				   	if(TRUE)then --	checkCSC(input_message,CS_recv_byte)
 						stm_parser <= setData2Out; -- проверка пройдена, выставляем данные на выход
 					else
 						stm_parser <= waitStartSymbol; -- контрольная сумма не верна, ожидаем новый пакет
