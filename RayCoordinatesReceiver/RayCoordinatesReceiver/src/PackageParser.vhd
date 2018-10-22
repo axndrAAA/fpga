@@ -144,15 +144,16 @@ begin
 					end if;					
 				
 				when readPackageBodySize =>
-					if(data_input_rdy = '1')then -- считываем размер пакета
-						if( recv_byte_count = 2)then -- приняты оба байта размера посылки
+				if(data_input_rdy = '1')then -- считываем размер пакета
+						input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
+						packageBodySize <= packageBodySize(7 downto 0) & data_input; -- считываем размер в отдельную переменную
+						recv_byte_count <= recv_byte_count + 1;	
+						
+						if(recv_byte_count = 1)then	-- приняты оба байта размера посылки
 						  	recv_byte_count <= (others=> '0');		-- сбрасываем счетчик принятых байт
-						  	stm_parser <= readCommand; -- и переходим к считыванию комманды
-						else
-							input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
-							packageBodySize <= packageBodySize(7 downto 0) & data_input; -- считываем размер в отдельную переменную
-							recv_byte_count <= recv_byte_count + 1;
+						  	stm_parser <= readCommand; -- и переходим к считыванию комманд
 						end if;
+
 
 					end if;				
 				when multucastAdrRead =>
