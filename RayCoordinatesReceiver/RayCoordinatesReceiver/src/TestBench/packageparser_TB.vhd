@@ -31,11 +31,10 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 		data_input : in STD_LOGIC_VECTOR(7 downto 0);
 		data_input_rdy : in STD_LOGIC;
 		
-		coord_data_rdy : out STD_LOGIC;
-		command_rdy : out STD_LOGIC;
+		command_output_rdy : out STD_LOGIC;
 		LsinA : out STD_LOGIC_VECTOR(31 downto 0);
-		LsinB : out STD_LOGIC_VECTOR(31 downto 0);
-		command_output : out STD_LOGIC_VECTOR(7 downto 0) );
+		LsinB : out STD_LOGIC_VECTOR(31 downto 0)
+		);
 	end component;
 
 	constant c_BIT_PERIOD : time := 8680 ns;
@@ -51,7 +50,7 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	signal LsinB : STD_LOGIC_VECTOR(31 downto 0); 
 	signal coord_data_rdy : STD_LOGIC;
 	signal command_output : STD_LOGIC_VECTOR(7 downto 0);
-	signal command_rdy : STD_LOGIC;
+	signal command_output_rdy : STD_LOGIC;
 	
 	--входные сигналы uart приемника
 	signal uart_in : STD_LOGIC:='1';
@@ -86,11 +85,9 @@ begin
 			module_adress => module_adress,
 			data_input => data_input,
 			data_input_rdy => data_input_rdy,
-			coord_data_rdy => coord_data_rdy,
-			command_rdy => command_rdy,
+			command_output_rdy => command_output_rdy,
 			LsinA => LsinA,
-			LsinB => LsinB,
-			command_output => command_output
+			LsinB => LsinB
 		);
 		
 	UUT1 : rs_in

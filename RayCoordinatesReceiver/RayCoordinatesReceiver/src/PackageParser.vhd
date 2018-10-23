@@ -33,12 +33,10 @@ entity packageParser is
 		 module_adress 	: in std_logic_vector(7 downto 0); -- адрес устройства
 		 data_input		: in std_logic_vector(7 downto 0);  -- входные данные от uart приемника
 		 data_input_rdy : in std_logic; -- готовность данных на входе от uart приемника
-		 
-		 coord_data_rdy : out std_logic; -- 1-когда на обоих шинах LsinA и LsinB установлены валидные данные
-		 command_rdy : out std_logic; -- 1-когда на шине command_output сформирована и установлена валидная команда
+
+		 command_output_rdy : out std_logic; -- 1-когда на на обоих шинах LsinA и LsinB установлены валидные данные и можно формировать ответную команду
 		 LsinA : out std_logic_vector(31 downto 0); -- 32х битная шина для числового значения синуса угла А отклонения луча 
-		 LsinB : out std_logic_vector(31 downto 0);	-- 32х битная шина для числового значения синуса угла B отклонения луча 
-		 command_output : out std_logic_vector(7 downto 0) -- 8х битная шина для комманды передаваемой затем в выходной uart.
+		 LsinB : out std_logic_vector(31 downto 0)	-- 32х битная шина для числового значения синуса угла B отклонения луча 
 	     );
 end packageParser;
 
@@ -94,11 +92,11 @@ begin
 		if(rising_edge(clk))then
 			if(reset = '1')then -- общий сброс системы
 				stm_parser <= waitStartSymbol;
-				coord_data_rdy <= '0';
-				command_rdy <= '0';
+				--coord_data_rdy <= '0';
+				command_output_rdy <= '0';
 				LsinA <= (others => '0');
 				LsinB <= (others => '0');
-				command_output <= (others => '0');
+				--command_output <= (others => '0');
 			end if;
 			
 			case stm_parser is
@@ -106,7 +104,7 @@ begin
 --					input_message <= (others => '0'); -- сбрасываем считанное сообщение
 --					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
 --					coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
---					command_rdy <= '0';
+--					command_output_rdy <= '0';
 --					LsinA <= (others => '0');
 --					LsinB <= (others => '0');
 --					command_output <= (others => '0');
@@ -114,13 +112,13 @@ begin
 --						stm_parser <= waitStartSymbol;
 --					end if;				
 				when waitStartSymbol =>
-					input_message <= (others => '0'); -- сбрасываем считанное сообщение
-					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
-					coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
-					command_rdy <= '0';
+					--input_message <= (others => '0'); -- сбрасываем считанное сообщение
+					--packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
+					--coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
+					command_output_rdy <= '0';
 					LsinA <= (others => '0');
 					LsinB <= (others => '0');
-					command_output <= (others => '0');
+					--command_output <= (others => '0');
 					if(data_input_rdy = '1')then
 						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля
@@ -195,11 +193,11 @@ begin
 					end if;					
 				
 				when setData2Out =>	--выставляем данные на выход
-					LsinB <= input_message(95 downto 64);
-					LsinA <= input_message(63 downto 32);
+					LsinA <= input_message(71 downto 40);--input_message(95 downto 64);
+					LsinB <= input_message(39 downto 8);
 					stm_parser <= dataRdy_formAnsw;
 				when dataRdy_formAnsw => -- посылаем команду на формирование ответа 
-					coord_data_rdy <= '1';
+					command_output_rdy <= '1';
 					stm_parser <= waitStartSymbol; -- и переходим на исходную
 				when others => 
 					stm_parser <= waitStartSymbol;
