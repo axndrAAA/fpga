@@ -34,9 +34,10 @@ entity packageParser is
 		 data_input		: in std_logic_vector(7 downto 0);  -- входные данные от uart приемника
 		 data_input_rdy : in std_logic; -- готовность данных на входе от uart приемника
 
-		 command_output_rdy : out std_logic; -- 1-когда на на обоих шинах LsinA и LsinB установлены валидные данные и можно формировать ответную команду
+		 command_output_rdy : out std_logic; -- 1-когда на на шинах LsinA, command_output и LsinB установлены валидные данные и можно формировать ответную команду
 		 LsinA : out std_logic_vector(31 downto 0); -- 32х битная шина для числового значения синуса угла А отклонения луча 
-		 LsinB : out std_logic_vector(31 downto 0)	-- 32х битная шина для числового значения синуса угла B отклонения луча 
+		 LsinB : out std_logic_vector(31 downto 0);	-- 32х битная шина для числового значения синуса угла B отклонения луча 
+		 command_output		: out std_logic_vector(7 downto 0)	-- сюда выставляется код комманды данного модуля
 	     );
 end packageParser;
 
@@ -96,7 +97,7 @@ begin
 				command_output_rdy <= '0';
 				LsinA <= (others => '0');
 				LsinB <= (others => '0');
-				--command_output <= (others => '0');
+				command_output <= (others => '0');
 			end if;
 			
 			case stm_parser is
@@ -118,7 +119,7 @@ begin
 					command_output_rdy <= '0';
 					LsinA <= (others => '0');
 					LsinB <= (others => '0');
-					--command_output <= (others => '0');
+					command_output <= (others => '0');
 					if(data_input_rdy = '1')then
 						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля
@@ -195,6 +196,7 @@ begin
 				when setData2Out =>	--выставляем данные на выход
 					LsinA <= input_message(71 downto 40);--input_message(95 downto 64);
 					LsinB <= input_message(39 downto 8);
+					command_output <= commandCode;
 					stm_parser <= dataRdy_formAnsw;
 				when dataRdy_formAnsw => -- посылаем команду на формирование ответа 
 					command_output_rdy <= '1';

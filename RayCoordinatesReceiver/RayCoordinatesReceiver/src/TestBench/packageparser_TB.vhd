@@ -33,8 +33,23 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 		
 		command_output_rdy : out STD_LOGIC;
 		LsinA : out STD_LOGIC_VECTOR(31 downto 0);
-		LsinB : out STD_LOGIC_VECTOR(31 downto 0)
+		LsinB : out STD_LOGIC_VECTOR(31 downto 0);
+		command_output		: out std_logic_vector(7 downto 0)
 		);
+	end component;
+	
+	component answBuild 
+	port(
+		 clk 			: in std_logic; 
+		 reset 			: in std_logic; 
+		 adr 		: in STD_LOGIC_VECTOR(7 downto 0);
+		 com_code 	: in STD_LOGIC_VECTOR(7 downto 0);
+		 start		: in std_logic; 
+		 transmitter_rdy	: in std_logic; 	
+		 
+		 data_out : out STD_LOGIC_VECTOR(7 downto 0);
+		 data_out_rdy : out STD_LOGIC
+	     );
 	end component;
 
 	constant c_BIT_PERIOD : time := 8680 ns;
@@ -50,7 +65,11 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	signal LsinB : STD_LOGIC_VECTOR(31 downto 0); 
 	signal coord_data_rdy : STD_LOGIC;
 	signal command_output : STD_LOGIC_VECTOR(7 downto 0);
-	signal command_output_rdy : STD_LOGIC;
+	signal command_output_rdy : STD_LOGIC; 
+	--выход answerBuilder
+	signal transmitter_rdy	:  std_logic;
+	signal ab_data_out :  STD_LOGIC_VECTOR(7 downto 0);
+	signal ab_data_out_rdy :  STD_LOGIC;
 	
 	--входные сигналы uart приемника
 	signal uart_in : STD_LOGIC:='1';
@@ -87,7 +106,8 @@ begin
 			data_input_rdy => data_input_rdy,
 			command_output_rdy => command_output_rdy,
 			LsinA => LsinA,
-			LsinB => LsinB
+			LsinB => LsinB,
+			command_output =>command_output
 		);
 		
 	UUT1 : rs_in
@@ -99,6 +119,18 @@ begin
 			data_out => data_input,
 			data_rdy => data_input_rdy
 	);	
+	
+	UUT2 : answBuild
+	port map (
+			clk => clk,
+			reset => reset,
+			adr => module_adress,
+		 	com_code => command_output,
+		 	start => command_output_rdy,
+		 	transmitter_rdy	=> transmitter_rdy,		 
+		 	data_out => ab_data_out,
+		 	data_out_rdy => ab_data_out_rdy
+	);
 	
 	
 	clk	<= not clk after 5 ns;
