@@ -58,13 +58,12 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=packageparser_tb|TB_ARCHITECTURE|0 
+HierarchyInformation=packageparser_tb|TB_ARCHITECTURE|0
 ShowHide=ShowTopLevel
 Selected=
 
 [Files]
 /uart_TX.vhd=-1
-/CoordinaresRX_main_auto.vhd=-1
 /uart_RX.vhd=-1
 /PackageParser.vhd=-1
 /answerBuilder.vhd=-1

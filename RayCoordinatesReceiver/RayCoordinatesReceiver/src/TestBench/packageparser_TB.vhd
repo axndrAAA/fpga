@@ -50,6 +50,18 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 		 data_out : out STD_LOGIC_VECTOR(7 downto 0);
 		 data_out_rdy : out STD_LOGIC
 	     );
+	end component; 
+	
+	component uart_tx
+	port(
+		clk			: in std_logic;
+		reset		: in std_logic; 
+		data_in		: in std_logic_vector(7 downto 0);
+		data_in_rdy	: in std_logic;
+
+		uart_out	: out std_logic; 
+		msg_sent	: out std_logic	
+	);
 	end component;
 
 	constant c_BIT_PERIOD : time := 8680 ns;
@@ -66,12 +78,13 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	signal coord_data_rdy : STD_LOGIC;
 	signal command_output : STD_LOGIC_VECTOR(7 downto 0);
 	signal command_output_rdy : STD_LOGIC; 
-	--выход answerBuilder
-	signal transmitter_rdy	:  std_logic;
+	--выходы answerBuilder
 	signal ab_data_out :  STD_LOGIC_VECTOR(7 downto 0);
 	signal ab_data_out_rdy :  STD_LOGIC;
-	
-	--входные сигналы uart приемника
+	--выходы uart приемника
+	signal uart_out	: std_logic; 
+	signal msg_sent	: std_logic;	
+	--входной сигнал uart приемника
 	signal uart_in : STD_LOGIC:='1';
 	
 	--файл с сообщением
@@ -127,9 +140,19 @@ begin
 			adr => module_adress,
 		 	com_code => command_output,
 		 	start => command_output_rdy,
-		 	transmitter_rdy	=> transmitter_rdy,		 
+		 	transmitter_rdy	=> msg_sent,		 
 		 	data_out => ab_data_out,
 		 	data_out_rdy => ab_data_out_rdy
+	);
+	
+	UUT3 : uart_tx
+	port map (
+			clk => clk,
+			reset => reset,
+			data_in	=> 	ab_data_out,
+			data_in_rdy	=> ab_data_out_rdy,
+			uart_out => uart_out,
+			msg_sent => msg_sent
 	);
 	
 	
