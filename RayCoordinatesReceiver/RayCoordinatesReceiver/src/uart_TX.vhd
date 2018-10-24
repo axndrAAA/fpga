@@ -37,14 +37,14 @@ end uart_tx;
 architecture uart_tx of uart_tx is	
 	constant clk_per_bit	: std_logic_vector(15 downto 0):=x"0361"; -- число тактов на каждый бит
 	type stm_states is (
-		waitData, -- начальное состо€ние. ќжидание данных на входе
-		buferingData, -- сохранение данных на входной шине во внутренний буфер
+		waitDataForBufering, -- начальное состо€ние. ќжидание данных на входе
+		--buferingData, -- сохранение данных на входной шине во внутренний буфер
 		txStartBit, -- передача стартового бита
 		txData, -- передача данных 
 		txStopBit -- передача стопового бита
 	);
 	
-	signal st_main			:	stm_states:= waitData; -- переменна€ состо€ни€ конечного автомата
+	signal st_main			:	stm_states:= waitDataForBufering; -- переменна€ состо€ни€ конечного автомата
 	signal tx_bit_index 	:	integer range 0 to 7:=0; -- счетчик переданного бита
 	signal input_data_bufer	: 	std_logic_vector(7 downto 0):=(others => '0'); -- входной буфер
 	signal clk_bit_counter	: 	std_logic_vector(15 downto 0); -- счетчик отсчета тактового сигнала при передаче бита  
@@ -55,23 +55,27 @@ begin
 	  begin
 	  	if (rising_edge(clk)) then
 			if(reset = '1')  then
-				st_main	<= waitData;
+				st_main	<= waitDataForBufering;
 			end if;
 			
 			case st_main is				
-				when waitData => -- режим ожидани€ данных на входе
-					uart_out <= '1'; --	подт€гиваем выход к логической 1
-					msg_sent <= '1';	 
+				when waitDataForBufering => -- режим ожидани€ данных на входе
+					uart_out <= '1'; --	подт€гиваем выход к логической 
 					tx_bit_index <= 0; -- обнул€ем счетчик переданных бит
-					if (data_in_rdy = '1')then -- если на входной шине есть валидные данные
-						st_main <= buferingData; -- переходим к буферизации данных
+					if (data_in_rdy = '1')then -- если на входной шине есть валидные данные	
+						msg_sent <= '0';
+						input_data_bufer <= data_in; -- буферизаци€ вх. данных
+						st_main <= txStartBit; -- преходим к передаче посылки
+						clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
+					else
+						msg_sent <= '1';
 					end if;	
 
-				when buferingData =>
-					msg_sent <= '0';
-					input_data_bufer <= data_in;
-					st_main <= txStartBit;
-					clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
+--				when buferingData =>
+--					msg_sent <= '0';
+--					input_data_bufer <= data_in;
+--					st_main <= txStartBit;
+--					clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
 				when txStartBit =>
 					uart_out <= '0'; -- устанавливаем лог.0 на выход
 					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита
@@ -99,10 +103,11 @@ begin
 						clk_bit_counter <= clk_bit_counter + '1';
 					else
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик
-						st_main <= waitData; -- и переходим к ожиданию следующей посылки
+						msg_sent <= '1'; -- выставл€ем готовность к передаче данных
+						st_main <= waitDataForBufering; -- и переходим к ожиданию следующей посылки
 					end if;							
 				when others => 
-					st_main <= waitData;
+					st_main <= waitDataForBufering;
 				end case;
 		end if;		  
 	end process main_pr;   
