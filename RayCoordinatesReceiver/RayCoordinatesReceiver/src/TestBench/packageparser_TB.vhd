@@ -66,14 +66,13 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 
 	-- Stimulus signals - signals mapped to the input and inout ports of tested entity
 	signal clk : STD_LOGIC:='0';
-	signal reset : STD_LOGIC;
+	signal reset : STD_LOGIC:='0';
 	signal module_adress : STD_LOGIC_VECTOR(7 downto 0):=x"03";
 	signal data_input : STD_LOGIC_VECTOR(7 downto 0):=x"00";
 	signal data_input_rdy : STD_LOGIC:='0';
 	-- Observed signals - signals mapped to the output ports of tested entity
 	signal LsinA : STD_LOGIC_VECTOR(31 downto 0);
 	signal LsinB : STD_LOGIC_VECTOR(31 downto 0); 
-	signal coord_data_rdy : STD_LOGIC;
 	signal command_output : STD_LOGIC_VECTOR(7 downto 0);
 	signal command_output_rdy : STD_LOGIC; 
 	--выходы answerBuilder
@@ -163,27 +162,34 @@ begin
 	
 	wait for 2000 ns;
 	while not endfile(file_bytes) loop
+		if(reset = '0')then
+			module_adress <= x"03";
 			readline(file_bytes, v_ILINE);
 			read(v_ILINE, n_byte);
 			UART_WRITE_BYTE(n_byte, uart_in);--передача на вход uart
-			report "Msg sent." severity note;
-			--data_input <= n_byte;
---			data_input_rdy <= '1';	
-		wait for 10 ns;
-	end loop;	   
---	if(not endfile(file_bytes))then
---		data_input <= x"00";
---		data_input_rdy <= '0';
---	end if;
-	
-	wait for 20 ns;
-	
-	file_close(file_bytes);
-
+			report "Msg sent." severity note;	
+			wait for 10 ns;
+		else
+			uart_in <= '1';
+			module_adress <= x"00";
+		end if;
 		
-		assert false report "Finish." severity note;
-end process;
+	end loop;
+	wait for 20 ns;
+	file_close(file_bytes);
+	
+	assert false report "Finish." severity note;
+end process;   
 
+process		
+begin  
+   wait for 2400 us;
+   --reset<= not reset after 5 ns;
+   reset<='1','0' after 20 ns;
+   file_close(file_bytes); 		   
+   file_open(file_bytes, "input_bytes.txt",  read_mode);
+   wait for 200 us;
+end process;
 
 end TB_ARCHITECTURE;
 

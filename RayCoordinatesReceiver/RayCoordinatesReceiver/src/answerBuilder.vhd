@@ -14,13 +14,9 @@
 --
 -------------------------------------------------------------------------------
 --
--- Description : 
+-- Description : 	модуль формироует ответ по линии uart
 --
 -------------------------------------------------------------------------------
-
---{{ Section below this comment is automatically maintained
---   and may be overwritten
---{entity {answBuild} architecture {answBuild}}
 
 library IEEE;
 use IEEE.std_logic_1164.all;   
@@ -55,7 +51,7 @@ architecture answBuild of answBuild is
 	
 	signal stm		:	stm_states:= waitData; -- переменная состояния конечного автомата 
 	signal message	: std_logic_vector(47 downto 0):= (others => '0'); -- формируемое сообщени
-	signal tx_bit_index 	:	integer range 0 to 7:=0; -- счетчик переданного байта
+	signal tx_byte_index 	:	integer range 0 to 7:=0; -- счетчик переданного байта
 	signal clk_1_byte_tx_counter	: std_logic_vector(19 downto 0):=(others => '0'); -- счетчик ожидания до выставления на выход следующего байта
 	
 function calcCS ( message : in std_logic_vector(47 downto 0) ) return std_logic_vector is	
@@ -71,8 +67,8 @@ main_pr:process(clk)
 begin
 	if(rising_edge(clk))then 
 		if(reset = '1')then
-			data_out <= (others => '0');
-			data_out_rdy <= '0';
+			data_out <= (others => '0'); 
+			tx_byte_index <= 0;
 			stm <= waitData;				
 		end if;				 
 
@@ -89,14 +85,14 @@ begin
 				stm <= transmit;
 			when transmit => -- передаем данные
 				data_out_rdy <= '0';
-				if(tx_bit_index = msgSize)then 											
-					tx_bit_index <= 0;
+				if(tx_byte_index = msgSize)then 											
+					tx_byte_index <= 0;
 					stm <= waitData; -- если переданы все байты возвращаемся на исходную 
 					else
 						if (clk_1_byte_tx_counter = clk_1_byte_tx)then
-							data_out <= message(8*(tx_bit_index + 1)-1 downto 8*tx_bit_index);
+							data_out <= message(8*(tx_byte_index + 1)-1 downto 8*tx_byte_index);
 							data_out_rdy <= '1'; 
-							tx_bit_index <= tx_bit_index + 1;
+							tx_byte_index <= tx_byte_index + 1;
 							clk_1_byte_tx_counter <= x"00000";
 						else
 							clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						

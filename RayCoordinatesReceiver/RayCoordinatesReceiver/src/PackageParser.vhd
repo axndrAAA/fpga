@@ -14,14 +14,9 @@
 --
 -------------------------------------------------------------------------------
 --
--- Description : 
+-- Description : 	парсер и реализующий его основной автомат 
 --
 -------------------------------------------------------------------------------
-
---{{ Section below this comment is automatically maintained
---   and may be overwritten
---{entity {packageParser} architecture {packageParser}}
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.STD_LOGIC_unsigned.all;
@@ -57,8 +52,7 @@ constant commandCode		: std_logic_vector(7 downto 0):=x"22"; -- код комманды для
 		readReserveByte, --считываем резервный байт
 		readCSByte, -- считываем байт контрольной суммы
 		checkCS, -- считаем и проверяем контрольную сумму
-		setData2Out, -- выставляем данные на выходы
-		dataRdy_formAnsw -- валидные данные на выходе, формируем ответ
+		setData2Out -- выставляем данные на выходы и формируем сигнал о формировании ответа 
 	);
 	signal stm_parser		:	stm_states:= waitStartSymbol; -- переменная состояния конечного автомата
 	signal input_message	:	std_logic_vector(103 downto 0); --входное сообщение
@@ -93,33 +87,20 @@ begin
 		if(rising_edge(clk))then
 			if(reset = '1')then -- общий сброс системы
 				stm_parser <= waitStartSymbol;
-				--coord_data_rdy <= '0';
 				command_output_rdy <= '0';
 				LsinA <= (others => '0');
 				LsinB <= (others => '0');
-				command_output <= (others => '0');
+				command_output <= (others => '0'); 
+				recv_byte_count <= x"00";
+				isCorrectCommandRecv <= '0';
 			end if;
 			
-			case stm_parser is
---				when waitStartSymbol => -- ожидаем прихода стартового символа
---					input_message <= (others => '0'); -- сбрасываем считанное сообщение
---					packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
---					coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
---					command_output_rdy <= '0';
---					LsinA <= (others => '0');
---					LsinB <= (others => '0');
---					command_output <= (others => '0');
---					if(data_input_rdy = '1')then
---						stm_parser <= waitStartSymbol;
---					end if;				
+			case stm_parser is			
 				when waitStartSymbol =>
-					--input_message <= (others => '0'); -- сбрасываем считанное сообщение
-					--packageBodySize <= (others => '0'); -- обнуляем размер из считанного пакета	
-					--coord_data_rdy <= '0'; -- сбрасываем в ноль все выходы
 					command_output_rdy <= '0';
-					LsinA <= (others => '0');
-					LsinB <= (others => '0');
-					command_output <= (others => '0');
+					--LsinA <= (others => '0');
+					--LsinB <= (others => '0');
+					--command_output <= (others => '0');
 					if(data_input_rdy = '1')then
 						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля
@@ -156,6 +137,7 @@ begin
 				when multucastAdrRead =>
 					if(data_input_rdy = '1')then
 						-- действия выполняемые при считывании общего адреса
+						stm_parser <= waitStartSymbol;
 					end if;
 				when readCommand =>
 					if(data_input_rdy = '1')then -- считываем комманду
@@ -167,7 +149,7 @@ begin
 						end if;	
 					end if;				
 				when readPackageBody => 
-				if(data_input_rdy = '1')then -- считываем тело пакета (4 байта)
+				if(data_input_rdy = '1')then -- считываем тело пакета (8 байт)
 						input_message <= input_message(95 downto 0) & data_input; -- считываем байт в буфер
 						recv_byte_count <= recv_byte_count + 1;	
 						
@@ -197,10 +179,8 @@ begin
 					LsinA <= input_message(71 downto 40);--input_message(95 downto 64);
 					LsinB <= input_message(39 downto 8);
 					command_output <= commandCode;
-					stm_parser <= dataRdy_formAnsw;
-				when dataRdy_formAnsw => -- посылаем команду на формирование ответа 
-					command_output_rdy <= '1';
-					stm_parser <= waitStartSymbol; -- и переходим на исходную
+					command_output_rdy <= '1'; -- посылаем команду на формирование ответа
+					stm_parser <= waitStartSymbol;-- и переходим на исходную
 				when others => 
 					stm_parser <= waitStartSymbol;
 				end case;

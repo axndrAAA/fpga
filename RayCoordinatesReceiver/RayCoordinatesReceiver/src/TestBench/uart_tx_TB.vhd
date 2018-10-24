@@ -84,9 +84,6 @@ begin
 	begin  	  
 		wait for 2000 ns; 
 		
---		data_in <= x"4C";
---		data_in_rdy <= '1';
-		
 		 for i in 0 to 5 loop
 			if(reset = '0')then	 
 				test_msg <= test_msg + '1';
