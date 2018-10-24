@@ -33,7 +33,6 @@ entity answBuild is
 		 adr 		: in STD_LOGIC_VECTOR(7 downto 0); -- адрес модуля (необходимо, чтобы он был выставлен всегда)
 		 com_code 	: in STD_LOGIC_VECTOR(7 downto 0); -- код комманды (приходит из парсера пакета)
 		 start		: in std_logic; -- запуск формирования ответа. При этом на остальных входах уже есть валидные данные
-		 transmitter_rdy	: in std_logic; 	-- флаг отправки очередного сообщения 
 		 
 		 data_out : out STD_LOGIC_VECTOR(7 downto 0); --8ми битная выходная шина
 		 data_out_rdy : out STD_LOGIC -- готовность данных на выходе
@@ -94,24 +93,19 @@ begin
 					tx_bit_index <= 0;
 					stm <= waitData; -- если переданы все байты возвращаемся на исходную 
 					else
-				 --elsif(transmitter_rdy = '1')then
-					if (clk_1_byte_tx_counter = clk_1_byte_tx)then
-						data_out <= message(8*(tx_bit_index + 1)-1 downto 8*tx_bit_index);
-						data_out_rdy <= '1'; 
-						tx_bit_index <= tx_bit_index + 1;
-						clk_1_byte_tx_counter <= x"00000";
-					else
-						clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
-					end if;					
+						if (clk_1_byte_tx_counter = clk_1_byte_tx)then
+							data_out <= message(8*(tx_bit_index + 1)-1 downto 8*tx_bit_index);
+							data_out_rdy <= '1'; 
+							tx_bit_index <= tx_bit_index + 1;
+							clk_1_byte_tx_counter <= x"00000";
+						else
+							clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
+						end if;					
 				end if;
-
 			when others =>
 				stm <= waitData;
 		end case;
-		
-		
 	end if;
-
 end process main_pr;
 
 end answBuild;

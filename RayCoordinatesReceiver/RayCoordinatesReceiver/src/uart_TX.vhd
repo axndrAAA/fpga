@@ -28,8 +28,7 @@ entity uart_tx is
 	data_in		: in std_logic_vector(7 downto 0);-- 8 битна€ входна€ шина
 	data_in_rdy	: in std_logic; -- 1- значит на data_in валидные данные и их можно считывать
 
-	uart_out	: out std_logic; -- выходной uart 8N1 115200
-	tx_rdy	: out std_logic	-- флаг отправки очередного сообщени€
+	uart_out	: out std_logic -- выходной uart 8N1 115200
 	);
 end uart_tx;
 
@@ -38,7 +37,6 @@ architecture uart_tx of uart_tx is
 	constant clk_per_bit	: std_logic_vector(15 downto 0):=x"0361"; -- число тактов на каждый бит
 	type stm_states is (
 		waitDataForBufering, -- начальное состо€ние. ќжидание данных на входе
-		--buferingData, -- сохранение данных на входной шине во внутренний буфер
 		txStartBit, -- передача стартового бита
 		txData, -- передача данных 
 		txStopBit -- передача стопового бита
@@ -63,19 +61,10 @@ begin
 					uart_out <= '1'; --	подт€гиваем выход к логической 
 					tx_bit_index <= 0; -- обнул€ем счетчик переданных бит
 					if (data_in_rdy = '1')then -- если на входной шине есть валидные данные	
-						tx_rdy <= '0';
 						input_data_bufer <= data_in; -- буферизаци€ вх. данных
 						st_main <= txStartBit; -- преходим к передаче посылки
 						clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
-					else
-						tx_rdy <= '1';
 					end if;	
-
---				when buferingData =>
---					tx_rdy <= '0';
---					input_data_bufer <= data_in;
---					st_main <= txStartBit;
---					clk_bit_counter <=(others=>'0'); -- обнул€ем счетчик
 				when txStartBit =>
 					uart_out <= '0'; -- устанавливаем лог.0 на выход
 					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита
@@ -103,7 +92,6 @@ begin
 						clk_bit_counter <= clk_bit_counter + '1';
 					else
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик
-						tx_rdy <= '1'; -- выставл€ем готовность к передаче данных
 						st_main <= waitDataForBufering; -- и переходим к ожиданию следующей посылки
 					end if;							
 				when others => 
