@@ -60,7 +60,7 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 		data_in_rdy	: in std_logic;
 
 		uart_out	: out std_logic; 
-		msg_sent	: out std_logic	
+		tx_rdy		: out std_logic	
 	);
 	end component;
 
@@ -152,7 +152,7 @@ begin
 			data_in	=> 	ab_data_out,
 			data_in_rdy	=> ab_data_out_rdy,
 			uart_out => uart_out,
-			msg_sent => msg_sent
+			tx_rdy => msg_sent
 	);
 	
 	
