@@ -8,6 +8,6 @@ TemplateId=0
 TemplateId=0
 [OPENDOC|Aldec.WaveFormASDB.7|.\RayCoordinatesReceiver\src/answBuilderWaveForm.awc|]
 TemplateId=1
+ActiveDocument=1
 [OPENDOC|Aldec.WaveFormASDB.7|.\RayCoordinatesReceiver\src/packageParerWaweForm.awc|]
 TemplateId=0
-ActiveDocument=1

@@ -44,7 +44,8 @@ end answBuild;
 architecture answBuild of answBuild is 
 	constant startSymbol 	: std_logic_vector(7 downto 0):=x"3A"; -- стартовый символ посылки 
 	constant commandSize	: std_logic_vector(15 downto 0):=x"0002"; -- размер посылки (не уверен, что именно такой, но точно 2х байтовый 
-	constant msgSize		: integer := 7;
+	constant clk_1_byte_tx	: std_logic_vector(19 downto 0):=x"021D4"; -- число тактов за которое происходит отправка всего сообщения по uart на скорости 115200
+	constant msgSize		: integer := 6;
 	constant ssymb_adr_packSz: std_logic_vector(31 downto 0):= startSymbol & adr & commandSize;
 
 	type stm_states is (
@@ -56,6 +57,7 @@ architecture answBuild of answBuild is
 	signal stm		:	stm_states:= waitData; -- переменная состояния конечного автомата 
 	signal message	: std_logic_vector(47 downto 0):= (others => '0'); -- формируемое сообщени
 	signal tx_bit_index 	:	integer range 0 to 7:=0; -- счетчик переданного байта
+	signal clk_1_byte_tx_counter	: std_logic_vector(19 downto 0):=(others => '0'); -- счетчик ожидания до выставления на выход следующего байта
 	
 function calcCS ( message : in std_logic_vector(47 downto 0) ) return std_logic_vector is	
 begin 
@@ -77,7 +79,6 @@ begin
 
 		case stm is
 			when waitData	=>	
-				--data_out <= (others => '0');
 				data_out_rdy <= '0';
 				if(start = '1')then	  
 					message <=  message(7 downto 0) & ssymb_adr_packSz & com_code;
@@ -85,16 +86,23 @@ begin
 				end if;			
 			when formAnsw_addCS => -- считаем и записываем контрольную сумму
 				message <= message(39 downto 0) & calcCS(message);
+				clk_1_byte_tx_counter <= clk_1_byte_tx; -- это необходимо, для моментальной передачи первого байта
 				stm <= transmit;
 			when transmit => -- передаем данные
 				data_out_rdy <= '0';
-				if(tx_bit_index = msgSize)then 
-					stm <= waitData; -- если переданы все байты возвращаемся на исходную
-				elsif(transmitter_rdy = '1')then
-					--data_out <= message(47-(tx_bit_index*8) downto 47-((tx_bit_index+1)*8));-- здесь что то не верно
-					data_out <= x"AA";
-					data_out_rdy <= '1'; 
-					tx_bit_index <= tx_bit_index + 1;
+				if(tx_bit_index = msgSize)then 											
+					tx_bit_index <= 0;
+					stm <= waitData; -- если переданы все байты возвращаемся на исходную 
+					else
+				 --elsif(transmitter_rdy = '1')then
+					if (clk_1_byte_tx_counter = clk_1_byte_tx)then
+						data_out <= message(8*(tx_bit_index + 1)-1 downto 8*tx_bit_index);
+						data_out_rdy <= '1'; 
+						tx_bit_index <= tx_bit_index + 1;
+						clk_1_byte_tx_counter <= x"00000";
+					else
+						clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
+					end if;					
 				end if;
 
 			when others =>
