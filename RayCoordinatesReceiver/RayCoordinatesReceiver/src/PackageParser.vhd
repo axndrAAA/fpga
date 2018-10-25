@@ -93,8 +93,7 @@ begin
 				command_output <= (others => '0'); 
 				recv_byte_count <= x"00";
 				isCorrectCommandRecv <= '0';
-			end if;
-			
+			else			
 			case stm_parser is			
 				when waitStartSymbol =>
 					command_output_rdy <= '0';
@@ -181,9 +180,8 @@ begin
 					command_output <= commandCode;
 					command_output_rdy <= '1'; -- посылаем команду на формирование ответа
 					stm_parser <= waitStartSymbol;-- и переходим на исходную
-				when others => 
-					stm_parser <= waitStartSymbol;
-				end case;
+				end case; 
+				end if;
 		end if;
 	end process main_pr;
 

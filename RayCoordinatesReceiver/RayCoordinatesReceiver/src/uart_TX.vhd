@@ -54,8 +54,8 @@ begin
 	  	if (rising_edge(clk)) then
 			if(reset = '1')  then
 				st_main	<= waitDataForBufering;
-			end if;
-			
+				clk_bit_counter <=(others=>'0');
+			else
 			case st_main is				
 				when waitDataForBufering => -- режим ожидани€ данных на входе
 					uart_out <= '1'; --	подт€гиваем выход к логической 
@@ -94,9 +94,8 @@ begin
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик
 						st_main <= waitDataForBufering; -- и переходим к ожиданию следующей посылки
 					end if;							
-				when others => 
-					st_main <= waitDataForBufering;
 				end case;
+				end if;
 		end if;		  
 	end process main_pr;   
 		

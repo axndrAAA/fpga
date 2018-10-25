@@ -70,8 +70,7 @@ begin
 			data_out <= (others => '0'); 
 			tx_byte_index <= 0;
 			stm <= waitData;				
-		end if;				 
-
+		else		 
 		case stm is
 			when waitData	=>	
 				data_out_rdy <= '0';
@@ -98,9 +97,8 @@ begin
 							clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
 						end if;					
 				end if;
-			when others =>
-				stm <= waitData;
 		end case;
+		end if;
 	end if;
 end process main_pr;
 
