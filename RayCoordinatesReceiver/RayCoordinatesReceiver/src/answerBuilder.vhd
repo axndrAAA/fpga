@@ -41,7 +41,7 @@ architecture answBuild of answBuild is
 	constant commandSize	: std_logic_vector(15 downto 0):=x"0002"; -- размер посылки (не уверен, что именно такой, но точно 2х байтовый 
 	constant clk_1_byte_tx	: std_logic_vector(19 downto 0):=x"021D4"; -- число тактов за которое происходит отправка всего сообщения по uart на скорости 115200
 	constant msgSize		: integer := 6;
-	constant ssymb_adr_packSz: std_logic_vector(31 downto 0):= startSymbol & adr & commandSize;
+	--constant ssymb_adr_packSz: std_logic_vector(31 downto 0):= startSymbol & adr & commandSize;
 
 	type stm_states is (
 		waitData, -- ожидаем данные и сразу их читаем в message (код комманды), и разрешения на формирование ответа ( на этот момент уже сформированы первые 4 байта ответа)
@@ -75,7 +75,7 @@ begin
 			when waitData	=>	
 				data_out_rdy <= '0';
 				if(start = '1')then	  
-					message <=  message(7 downto 0) & ssymb_adr_packSz & com_code;
+					message <=  message(7 downto 0) & startSymbol & adr & commandSize & com_code;
 					stm <= formAnsw_addCS;
 				end if;			
 			when formAnsw_addCS => -- считаем и записываем контрольную сумму
