@@ -67,32 +67,32 @@ begin
 					end if;	
 				when txStartBit =>
 					uart_out <= '0'; -- устанавливаем лог.0 на выход
-					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита
-						clk_bit_counter <= clk_bit_counter + '1';
-					else
+					if(clk_bit_counter = clk_per_bit)then -- отсчитываем длительность бита
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик, и
 						st_main <= txData; -- переходим к передаче битов данных
+					else
+					    clk_bit_counter <= clk_bit_counter + '1';
 					end if;
 				when txData => 
 					uart_out <= input_data_bufer(tx_bit_index); -- записываем передаваемый бит на выходную линию
-					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита 
-						clk_bit_counter <= clk_bit_counter + '1';
-					else 					
+					if(clk_bit_counter = clk_per_bit)then -- отсчитываем длительность бита 
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик
 						if (tx_bit_index < 7)then -- и проверяем не закончена ли передача посылки
 							tx_bit_index <=	 tx_bit_index + 1; -- если не закончена, переходим к передаче следующего бита
 						else
 							st_main <= txStopBit; -- если закончена, переходим к передаче стопового бита
-						end if;	
+						end if;		
+					else 					
+					   clk_bit_counter <= clk_bit_counter + '1';
 					end if;
 				
 				when txStopBit =>
 					uart_out <= '1';
-					if(clk_bit_counter < clk_per_bit)then -- отсчитываем длительность бита
-						clk_bit_counter <= clk_bit_counter + '1';
-					else
+					if(clk_bit_counter = clk_per_bit)then -- отсчитываем длительность бита
 						clk_bit_counter <=(others=>'0');-- если отсчитали, сбрасываем счетчик
 						st_main <= waitDataForBufering; -- и переходим к ожиданию следующей посылки
+					else
+						clk_bit_counter <= clk_bit_counter + '1';
 					end if;							
 				end case;
 				end if;

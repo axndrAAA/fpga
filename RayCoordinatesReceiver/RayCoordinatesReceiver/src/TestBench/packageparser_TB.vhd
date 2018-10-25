@@ -181,15 +181,15 @@ begin
 	assert false report "Finish." severity note;
 end process;   
 
-process		
-begin  
-   wait for 2400 us;
-   --reset<= not reset after 5 ns;
-   reset<='1','0' after 20 ns;
-   file_close(file_bytes); 		   
-   file_open(file_bytes, "input_bytes.txt",  read_mode);
-   wait for 200 us;
-end process;
+--process		
+--begin  
+--   wait for 2400 us;
+--   --reset<= not reset after 5 ns;
+--   reset<='1','0' after 20 ns;
+--   file_close(file_bytes); 		   
+--   file_open(file_bytes, "input_bytes.txt",  read_mode);
+--   wait for 200 us;
+--end process;
 
 end TB_ARCHITECTURE;
 
