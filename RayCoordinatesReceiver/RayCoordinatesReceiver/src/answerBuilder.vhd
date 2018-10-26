@@ -53,6 +53,7 @@ architecture answBuild of answBuild is
 	signal message	: std_logic_vector(47 downto 0):= (others => '0'); -- формируемое сообщени
 	signal tx_byte_index 	:	integer range 0 to 7:=0; -- счетчик переданного байта
 	signal clk_1_byte_tx_counter	: std_logic_vector(19 downto 0):=(others => '0'); -- счетчик ожидания до выставления на выход следующего байта
+	signal cs_calc 	:	std_logic_vector(7 downto 0):=x"00"; -- сигнал для подсчета контрольной суммы
 	
 function calcCS ( message : in std_logic_vector(47 downto 0) ) return std_logic_vector is	
 begin 
