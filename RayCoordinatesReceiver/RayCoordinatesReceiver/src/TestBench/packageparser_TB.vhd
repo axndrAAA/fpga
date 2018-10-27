@@ -96,15 +96,30 @@ architecture TB_ARCHITECTURE of packageparser_tb is
  	begin 
     	-- Send Start Bit
     	o_serial <= '0';
-    	wait for c_BIT_PERIOD; 
+    	if(reset = '1')then
+			return;
+		else
+			wait for c_BIT_PERIOD;
+		end if;
+		--wait for c_BIT_PERIOD;
     	-- Send Data Byte
     	for ii in 0 to 7 loop
       		o_serial <= i_data_in(ii);
-      	wait for c_BIT_PERIOD;
+    	if(reset = '1')then
+			return;
+		else
+			wait for c_BIT_PERIOD;
+		end if;
+		--wait for c_BIT_PERIOD;
     	end loop;  -- ii
     	-- Send Stop Bit
     	o_serial <= '1';
-    	wait for c_BIT_PERIOD;
+    	if(reset = '1')then
+			return;
+		else
+			wait for c_BIT_PERIOD;
+		end if;	   
+	--wait for c_BIT_PERIOD;
   	end UART_WRITE_BYTE;
 
 begin
@@ -153,7 +168,7 @@ begin
 			uart_out => uart_out
 	);
 	
-	UUT4 : rs_in
+	UUT4 : rs_in -- тестовый uart приемник
 	port map (
 			clk => clk,
 			reset => reset,
@@ -167,7 +182,7 @@ begin
 	clk	<= not clk after 5 ns;
 process	is 
     variable v_ILINE     : line;
-    variable n_byte : std_logic_vector(7 downto 0);
+    variable n_byte : std_logic_vector(7 downto 0);																					 
     variable v_SPACE     : character;
 begin
 	-- время моделирования для одного сообщения 2100 us
@@ -186,6 +201,8 @@ begin
 		
 	else
 		uart_in <= '1';
+		file_close(file_bytes);
+		file_open(file_bytes, "input_bytes.txt",  read_mode);
 	end if;
 	end loop;	
 	
@@ -199,12 +216,7 @@ end process;
 --begin  
 --   wait for 2305 us;
 --   
---   reset<='1','0' after 20 ns;
---   wait for 10 ns;
--- --	module_adress <= x"00";
---	file_close(file_bytes);
---	file_open(file_bytes, "input_bytes.txt",  read_mode);
---   wait for 1400 us; 
+--   reset<='1','0' after c_BIT_PERIOD*8; --20 ns;
 --
 --end process;
 
