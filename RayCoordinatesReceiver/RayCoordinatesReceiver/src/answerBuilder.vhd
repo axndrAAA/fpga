@@ -69,7 +69,8 @@ begin
 		case stm is
 			when waitData	=>	
 				data_out_rdy <= '0';
-				if(start = '1')then	  
+				if(start = '1')then
+					cs_calc <= x"00";
 					message <= startSymbol & adr & commandSize & com_code;
 					clk_1_byte_tx_counter <= clk_1_byte_tx; -- это необходимо, для моментальной передачи первого байта
 					stm <= shiftDataToOutput;
@@ -83,6 +84,9 @@ begin
 					if (clk_1_byte_tx_counter = clk_1_byte_tx)then
 						message <= message(31 downto 0) & x"00";
 						data_out <= message(39 downto 32);
+						if(tx_byte_index /= 0)then  -- подсчет контрольной суммы( включет все байты кроме стартового символа
+							cs_calc <= cs_calc + message(39 downto 32);
+						end if;						
 						data_out_rdy <= '1'; 
 						tx_byte_index <= tx_byte_index + 1;
 						clk_1_byte_tx_counter <= x"00000";
