@@ -2,6 +2,7 @@
 # Sergey Kostyuk, 2017, Public Domain
 
 *.asdb/
+*.asdbw/
 log/
 Edfmap.ini
 *.wsp
@@ -13,7 +14,8 @@ Edfmap.ini
 *.cmd
 compile/
 *.set
-
+*.data
+*.index
 # Comment to save compilation order:
 compilation.order
 projlib.cfg

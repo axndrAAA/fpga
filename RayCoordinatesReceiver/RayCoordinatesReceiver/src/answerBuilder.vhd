@@ -40,14 +40,12 @@ architecture answBuild of answBuild is
 	constant startSymbol 	: std_logic_vector(7 downto 0):=x"3A"; -- стартовый символ посылки 
 	constant commandSize	: std_logic_vector(15 downto 0):=x"0002"; -- размер посылки (не уверен, что именно такой, но точно 2х байтовый 
 	constant clk_1_byte_tx	: std_logic_vector(19 downto 0):=x"021D4"; -- число тактов за которое происходит отправка всего сообщения по uart на скорости 115200
-	--constant msgSize		: integer := 6;
 	constant msgSize 	: std_logic_vector(7 downto 0):=x"05";
 
 	type stm_states is (
 		waitData, -- ожидаем данные и сразу их читаем в message (код комманды), и разрешения на формирование ответа ( на этот момент уже сформированы первые 4 байта ответа)
 		shiftDataToOutput, -- сдвигаем данные в message на 8 бит, и крайние выставляем на data_out
 		transmitCS -- передаем контрольную сумму
-		--transmit -- передаем данные на выходной блок
 	);
 	
 	signal stm		:	stm_states:= waitData; -- переменная состояния конечного автомата 
@@ -62,7 +60,8 @@ main_pr:process(clk)
 begin
 	if(rising_edge(clk))then 
 		if(reset = '1')then
-			data_out <= (others => '0'); 
+			data_out <= (others => '0');
+			data_out_rdy <= '0';
 			tx_byte_index <= 0;
 			stm <= waitData;				
 		else		 

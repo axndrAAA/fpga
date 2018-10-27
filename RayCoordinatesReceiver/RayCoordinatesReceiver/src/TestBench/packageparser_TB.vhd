@@ -12,7 +12,7 @@ end packageparser_tb;
 
 architecture TB_ARCHITECTURE of packageparser_tb is
 -- Component declaration of the tested unit
-		component rs_in
+	component rs_in
 	port(
 		clk : in STD_LOGIC;
 		reset : in STD_LOGIC;
@@ -83,6 +83,10 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	--входной сигнал uart приемника
 	signal uart_in : STD_LOGIC:='1';
 	
+	-- сигналы с выходного тестового uart приемника
+	signal test_uart_out :  STD_LOGIC_VECTOR(7 downto 0);
+	signal test_uart_out_rdy:  STD_LOGIC;
+	
 	--файл с сообщением
 	file file_bytes : text;
 	-- процедура отправки данных по uart
@@ -149,6 +153,16 @@ begin
 			uart_out => uart_out
 	);
 	
+	UUT4 : rs_in
+	port map (
+			clk => clk,
+			reset => reset,
+			uart_in => uart_out,
+			
+			data_out => test_uart_out,
+			data_rdy => test_uart_out_rdy
+	);
+	
 	
 	clk	<= not clk after 5 ns;
 process	is 
@@ -162,19 +176,19 @@ begin
 	
 	wait for 2000 ns;
 	while not endfile(file_bytes) loop
-		if(reset = '0')then
+	if(reset = '0')then		
 			module_adress <= x"03";
 			readline(file_bytes, v_ILINE);
 			read(v_ILINE, n_byte);
 			UART_WRITE_BYTE(n_byte, uart_in);--передача на вход uart
 			report "Msg sent." severity note;	
 			wait for 10 ns;
-		else
-			uart_in <= '1';
-			module_adress <= x"00";
-		end if;
 		
-	end loop;
+	else
+		uart_in <= '1';
+	end if;
+	end loop;	
+	
 	wait for 20 ns;
 	file_close(file_bytes);
 	
@@ -183,12 +197,15 @@ end process;
 
 --process		
 --begin  
---   wait for 2400 us;
---   --reset<= not reset after 5 ns;
+--   wait for 2305 us;
+--   
 --   reset<='1','0' after 20 ns;
---   file_close(file_bytes); 		   
---   file_open(file_bytes, "input_bytes.txt",  read_mode);
---   wait for 200 us;
+--   wait for 10 ns;
+-- --	module_adress <= x"00";
+--	file_close(file_bytes);
+--	file_open(file_bytes, "input_bytes.txt",  read_mode);
+--   wait for 1400 us; 
+--
 --end process;
 
 end TB_ARCHITECTURE;
