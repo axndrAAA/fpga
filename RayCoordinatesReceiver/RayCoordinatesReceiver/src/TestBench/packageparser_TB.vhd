@@ -63,6 +63,7 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	end component;
 
 	constant c_BIT_PERIOD : time := 8680 ns;
+	constant byte_delay : time := 75 us;
 
 	-- Stimulus signals - signals mapped to the input and inout ports of tested entity
 	signal clk : STD_LOGIC:='0';
@@ -85,42 +86,45 @@ architecture TB_ARCHITECTURE of packageparser_tb is
 	
 	-- сигналы с выходного тестового uart приемника
 	signal test_uart_out :  STD_LOGIC_VECTOR(7 downto 0);
-	signal test_uart_out_rdy:  STD_LOGIC;
+	signal test_uart_out_rdy:  STD_LOGIC; 
+	-- сигнал тестового входного uart_ передатчика
+	signal uart_test_input :  STD_LOGIC_VECTOR(7 downto 0);
+	signal uart_test_input_rdy:  STD_LOGIC; 
 	
 	--файл с сообщением
 	file file_bytes : text;
-	-- процедура отправки данных по uart
-	procedure UART_WRITE_BYTE (
-    	i_data_in       : in  std_logic_vector(7 downto 0);
-    	signal o_serial : out std_logic) is
- 	begin 
-    	-- Send Start Bit
-    	o_serial <= '0';
-    	if(reset = '1')then
-			return;
-		else
-			wait for c_BIT_PERIOD;
-		end if;
-		--wait for c_BIT_PERIOD;
-    	-- Send Data Byte
-    	for ii in 0 to 7 loop
-      		o_serial <= i_data_in(ii);
-    	if(reset = '1')then
-			return;
-		else
-			wait for c_BIT_PERIOD;
-		end if;
-		--wait for c_BIT_PERIOD;
-    	end loop;  -- ii
-    	-- Send Stop Bit
-    	o_serial <= '1';
-    	if(reset = '1')then
-			return;
-		else
-			wait for c_BIT_PERIOD;
-		end if;	   
-	--wait for c_BIT_PERIOD;
-  	end UART_WRITE_BYTE;
+--	-- процедура отправки данных по uart
+--	procedure UART_WRITE_BYTE (
+--    	i_data_in       : in  std_logic_vector(7 downto 0);
+--    	signal o_serial : out std_logic) is
+-- 	begin 
+--    	-- Send Start Bit
+--    	o_serial <= '0';
+--    	if(reset = '1')then
+--			return;
+--		else
+--			wait for c_BIT_PERIOD;
+--		end if;
+--		--wait for c_BIT_PERIOD;
+--    	-- Send Data Byte
+--    	for ii in 0 to 7 loop
+--      		o_serial <= i_data_in(ii);
+--    	if(reset = '1')then
+--			return;
+--		else
+--			wait for c_BIT_PERIOD;
+--		end if;
+--		--wait for c_BIT_PERIOD;
+--    	end loop;  -- ii
+--    	-- Send Stop Bit
+--    	o_serial <= '1';
+--    	if(reset = '1')then
+--			return;
+--		else
+--			wait for c_BIT_PERIOD;
+--		end if;	   
+--	--wait for c_BIT_PERIOD;
+--  	end UART_WRITE_BYTE;
 
 begin
 
@@ -176,8 +180,17 @@ begin
 			
 			data_out => test_uart_out,
 			data_rdy => test_uart_out_rdy
-	);
+	); 
 	
+	UUT5 : uart_tx -- тесстовый uart передатчик
+	port map (
+			clk => clk,
+			reset => reset,
+			data_in	=> 	uart_test_input,
+			data_in_rdy	=> uart_test_input_rdy,
+			
+			uart_out => uart_in
+	);
 	
 	clk	<= not clk after 5 ns;
 process	is 
@@ -192,15 +205,16 @@ begin
 	wait for 2000 ns;
 	while not endfile(file_bytes) loop
 	if(reset = '0')then		
-			module_adress <= x"03";
+		module_adress <= x"03";
 			readline(file_bytes, v_ILINE);
 			read(v_ILINE, n_byte);
-			UART_WRITE_BYTE(n_byte, uart_in);--передача на вход uart
-			report "Msg sent." severity note;	
+			uart_test_input <= n_byte;
+			uart_test_input_rdy <= '1';
 			wait for 10 ns;
-		
+			uart_test_input_rdy <= '0';
+			report "Msg sent." severity note;
+			wait for byte_delay*2;			
 	else
-		uart_in <= '1';
 		file_close(file_bytes);
 		file_open(file_bytes, "input_bytes.txt",  read_mode);
 	end if;
@@ -214,9 +228,9 @@ end process;
 
 --process		
 --begin  
---   wait for 2305 us;
+--   wait for 2270 us;
 --   
---   reset<='1','0' after c_BIT_PERIOD*8; --20 ns;
+--   reset<='1','0' after 50 ns;
 --
 --end process;
 
