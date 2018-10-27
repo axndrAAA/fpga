@@ -214,9 +214,10 @@ begin
 			uart_test_input_rdy <= '0';
 			report "Msg sent." severity note;
 			wait for byte_delay*2;			
-	else
-		file_close(file_bytes);
-		file_open(file_bytes, "input_bytes.txt",  read_mode);
+	else	
+		uart_test_input <= (others => '0');
+--		file_close(file_bytes);
+--		file_open(file_bytes, "input_bytes.txt",  read_mode);
 	end if;
 	end loop;	
 	
@@ -226,13 +227,14 @@ begin
 	assert false report "Finish." severity note;
 end process;   
 
---process		
---begin  
---   wait for 2270 us;
---   
---   reset<='1','0' after 50 ns;
---
---end process;
+process		
+begin  
+   wait for 3000 us;
+   reset<='1','0' after 50 ns;
+   file_close(file_bytes);
+	file_open(file_bytes, "input_bytes.txt",  read_mode);
+	wait for 13000 us;
+end process;
 
 end TB_ARCHITECTURE;
 

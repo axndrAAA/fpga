@@ -58,7 +58,7 @@ TestBench=1
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=packageparser_tb|TB_ARCHITECTURE|0         
+HierarchyInformation=packageparser_tb|TB_ARCHITECTURE|0 
 ShowHide=ShowTopLevel
 Selected=
 
@@ -72,6 +72,9 @@ Selected=
 /packageParerWaweForm.awc=-1
 /packageParserTB.awc=-1
 /packageParser.awc=-1
+/UUT5.awc=-1
+/UUT1.awc=-1
+/TB.awc=-1
 TestBench/uart_tx_TB.vhd=-1
 TestBench/uart_tx_TB_runtest.do=-1
 TestBench/packageparser_TB.vhd=-1
@@ -87,6 +90,9 @@ TestBench/packageparser_TB_runtest.do=-1
 .\src\packageParerWaweForm.awc=Accelerated Waveform Configuration
 .\src\packageParserTB.awc=Accelerated Waveform Configuration
 .\src\packageParser.awc=Accelerated Waveform Configuration
+.\src\UUT5.awc=Accelerated Waveform Configuration
+.\src\UUT1.awc=Accelerated Waveform Configuration
+.\src\TB.awc=Accelerated Waveform Configuration
 .\src\TestBench\uart_tx_TB.vhd=VHDL Test Bench
 .\src\TestBench\uart_tx_TB_runtest.do=Macro
 .\src\TestBench\packageparser_TB.vhd=VHDL Test Bench
