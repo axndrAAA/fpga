@@ -95,27 +95,15 @@ begin
 					end if;					
 				end if;
 			
-			when transmitCS =>
-				stm <= waitData;
-			--when formAnsw_addCS => -- считаем и записываем контрольную сумму
---				message <= message(39 downto 0) & calcCS(message);
---				clk_1_byte_tx_counter <= clk_1_byte_tx; -- это необходимо, для моментальной передачи первого байта
---				stm <= transmit;
---			when transmit => -- передаем данные
---				data_out_rdy <= '0';
---				if(tx_byte_index = msgSize)then 											
---					tx_byte_index <= 0;
---					stm <= waitData; -- если переданы все байты возвращаемся на исходную 
---					else
---						if (clk_1_byte_tx_counter = clk_1_byte_tx)then
---							data_out <= message(8*(tx_byte_index + 1)-1 downto 8*tx_byte_index);
---							data_out_rdy <= '1'; 
---							tx_byte_index <= tx_byte_index + 1;
---							clk_1_byte_tx_counter <= x"00000";
---						else
---							clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
---						end if;					
---				end if;
+			when transmitCS => -- передаем контрольную сумму
+				if (clk_1_byte_tx_counter = clk_1_byte_tx)then -- отсчитываем задержку
+						data_out <= cs_calc;					
+						data_out_rdy <= '1'; 
+						clk_1_byte_tx_counter <= x"00000";
+						stm <= waitData;
+				else
+						clk_1_byte_tx_counter <= clk_1_byte_tx_counter + 1;						
+				end if;
 		end case;
 		end if;
 	end if;
