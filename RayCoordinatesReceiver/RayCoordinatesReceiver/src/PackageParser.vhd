@@ -75,12 +75,10 @@ begin
 			case stm_parser is			
 				when waitStartSymbol =>
 					command_output_rdy <= '0'; -- выход не готов
-					cs_calc <= (others =>'0'); -- сброс подсчета контрольной суммы 
 					--это не нужно, но для отладки будет
-					LsinA <= (others => '0');
-					LsinB <= (others => '0');
-					command_output <= (others => '0');	
-					--
+					--LsinA <= (others => '0');
+					--LsinB <= (others => '0');
+					--command_output <= (others => '0');	
 					if(data_input_rdy = '1')then
 						if(data_input = StartSymbol)then -- получен стартовый символ посылки, не записываем его в input_message
 							stm_parser <= readModuleAdr; -- переходим к считыванию адреса модуля
@@ -92,26 +90,24 @@ begin
 				when readModuleAdr =>
 					if(data_input_rdy = '1')then
 						if(data_input = module_adress)then -- считан адрес данного модуля	
-							cs_calc <= cs_calc + data_input; -- прибавляем очередной байт к контрольной сумме
 							stm_parser <= readPackageBodySize; -- переходим к считыванию команды
 						elsif (data_input = multicastAddress)then -- получен общий адрес 
-							cs_calc <= cs_calc + data_input; -- прибавляем очередной байт к контрольной сумме
 							stm_parser <= multucastAdrRead; -- переходим к считыванию общей команды 
 						else 
 							stm_parser <= waitStartSymbol; -- считан мусор -> возвращаемся к ожиданию стартового символа
 						end if;
 						recv_byte_count <= (others=> '0'); -- сбрасываем счетчик принятых байт
 					end if;					
-				
+					cs_calc <= data_input; -- прибавляем очередной байт к контрольной сумме
 				when readPackageBodySize =>
 				if(data_input_rdy = '1')then -- считываем размер пакетар
 						packageBodySize <= packageBodySize(7 downto 0) & data_input; -- считываем размер в отдельную переменную
-						cs_calc <= cs_calc + data_input; -- прибавляем очередной байт к контрольной сумме
-						recv_byte_count <= recv_byte_count + 1;	
-						
+						cs_calc <= cs_calc + data_input; -- прибавляем очередной байт к контрольной сум
 						if(recv_byte_count = 1)then	-- приняты оба байта размера посылки
 						  	recv_byte_count <= (others=> '0');		-- сбрасываем счетчик принятых байт
 						  	stm_parser <= readCommand; -- и переходим к считыванию комманд
+						else
+							recv_byte_count <= recv_byte_count + 1;
 						end if;
 					end if;				
 				when multucastAdrRead =>
@@ -133,12 +129,13 @@ begin
 				if(data_input_rdy = '1')then -- считываем тело пакета (8 байт)
 					inp_pack_body_buf <= inp_pack_body_buf(55 downto 0) & data_input;
 					cs_calc <= cs_calc + data_input; -- прибавляем очередной байт к контрольной сумме
-						recv_byte_count <= recv_byte_count + 1;	
-						
 						if(recv_byte_count = (packageBodySize-1))then -- все байты тела пакета считаны идем дальше
 							recv_byte_count <= (others=> '0');
 							stm_parser <= readReserveByte;
+						else
+							recv_byte_count <= recv_byte_count + 1;
 						end if;
+						
 					end if;				
 				when readReserveByte =>
 					if(data_input_rdy = '1')then -- читаем резервный байт
